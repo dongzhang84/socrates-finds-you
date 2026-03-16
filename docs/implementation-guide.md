@@ -291,51 +291,97 @@ Use sqlite3 stdlib only. Call init_db() under if __name__ == '__main__'.
 
 ---
 
-**CC Prompt 2 — LinkedIn scraper:**
+**实际实现说明（与原始 prompt 有出入，已在调试中修正）**
 
+`scrapers/linkedin.py` 实现过程中遇到三个实际问题，逐一修复：
+
+**问题 1：登录流程 — 已登录 / Google SSO 重定向**
+
+LinkedIn 主页有时直接跳转到 `/feed`（Google SSO 保持登录）。原始实现无条件填表会 timeout。
+
+修复：
+```python
+page.goto("https://www.linkedin.com")
+if "/feed" not in page.url:
+    # 如果没有 email 输入框，先点 "Sign in with email"
+    email_input = page.query_selector('input[name="session_key"]')
+    if not email_input:
+        try:
+            page.click('a[data-tracking-control-name="guest_homepage-basic_sign-in-btn"]', timeout=5000)
+        except Exception:
+            page.click('text=Sign in with email', timeout=5000)
+        page.wait_for_selector('input[name="session_key"]', timeout=10000)
+    page.fill('input[name="session_key"]', email, timeout=10000)
+    page.fill('input[name="session_password"]', password, timeout=10000)
+    page.click('button[type="submit"]')
+    page.wait_for_url(lambda url: "feed" in url, timeout=20000)
+# else: 已在 feed，跳过登录
 ```
-Create scrapers/linkedin.py for socrates-finds-you.
 
-Use Playwright sync API. headless=False required — LinkedIn blocks headless browsers.
+**问题 2：搜索页 DOM — `.search-results-container` 已不存在**
 
-Export: scrape_linkedin(keywords: list[str], max_posts: int = 20) → list[dict]
+LinkedIn 已迁移到 SDUI 组件系统，旧 class 名（`.search-results-container`、`.feed-shared-update-v2` 等）全部失效。
 
-Logic:
-1. Load LINKEDIN_EMAIL and LINKEDIN_PASSWORD from .env
-2. Launch Chromium headless=False
-   args: ["--disable-blink-features=AutomationControlled", "--start-maximized"]
-3. Navigate to https://www.linkedin.com, fill login form, submit
-4. Wait for login (wait_for_url containing "feed", timeout=20000)
-5. For each keyword:
-   - Navigate to: https://www.linkedin.com/search/results/content/?keywords={urllib.parse.quote(keyword)}&sortBy=DATE_POSTED
-   - wait_for_selector(".search-results-container", timeout=10000)
-   - Collect visible post cards: text snippet + author + post URL
-   - Delay: time.sleep(random.uniform(3.0, 6.0))
-6. Deduplicate by URL, limit to max_posts
-7. Return list of dicts:
-  {
-    "platform": "linkedin",
-    "external_id": hashlib.md5(url.encode()).hexdigest()[:12],
-    "url": post URL,
-    "title": first 120 chars of snippet,
-    "body": full snippet[:2000],
-    "author": author name,
-    "subreddit": None,
-    "posted_at": None   # LinkedIn doesn't expose exact timestamps in search
-  }
-
-Default keywords (from main.py):
-  ["PhD career transition", "leaving academia", "learn machine learning",
-   "AI mentor", "career change data science", "PhD to industry",
-   "machine learning career", "data science transition"]
-
-Wrap all in try/except — return empty list on total failure, log error.
-Log: [linkedin] {N} posts scraped
+等待策略改为：
+```python
+# 优先尝试 SDUI 容器
+page.wait_for_selector('div[data-sdui-screen*="SearchResultsContent"]', timeout=10000)
+# 失败则 fallback 到 domcontentloaded + sleep(3)
+# ⚠️ 不用 networkidle — LinkedIn 有持续 XHR，networkidle 永远不会触发
 ```
+
+**问题 3：CSS class 名全部混淆 — 改用 JS DOM traversal**
+
+LinkedIn 当前 DOM 使用混淆 class（如 `_27d29e99`、`a47a5b30`），随时可能变更。
+改为在 `page.evaluate()` 里用稳定的 href 属性做 DOM traversal：
+
+```javascript
+// 找所有帖子链接
+const postLinks = document.querySelectorAll('a[href*="/feed/update/"]');
+for (const link of postLinks) {
+    // 向上找 card root（同时含 /in/ 和 /feed/update/ 链接的祖先）
+    let card = link;
+    for (let i = 0; i < 20; i++) {
+        card = card.parentElement;
+        if (card.hasAttribute('data-sdui-screen')) break;
+        if (card.querySelector('a[href*="/in/"]') && card.querySelector('a[href*="/feed/update/"]')) break;
+    }
+    // 作者：card 内第一个 /in/ 链接
+    const author = card.querySelector('a[href*="/in/"]')?.innerText.trim() ?? '';
+    // 正文：card 内最长的 <p> 文本
+    let snippet = '';
+    for (const p of card.querySelectorAll('p')) {
+        if (p.innerText.trim().length > snippet.length) snippet = p.innerText.trim();
+    }
+}
+```
+
+**稳定 selector 汇总（2026-03 验证）**：
+
+| 元素 | Selector |
+|------|----------|
+| 页面加载等待 | `div[data-sdui-screen*="SearchResultsContent"]` |
+| 帖子永久链接 | `a[href*="/feed/update/"]` |
+| Card 根节点 | 从帖子链接向上遍历，找同时含 `/in/` 和 `/feed/update/` 的祖先 |
+| 作者 | Card 内第一个 `a[href*="/in/"]`（`innerText` 或 `aria-label`） |
+| 正文 | Card 内所有 `<p>` 中 `innerText` 最长的 |
+
+**Debug 模式**：
+
+`scrape_linkedin()` 支持 `debug=True` 参数，或命令行 `--debug` flag：
+```bash
+python scrapers/linkedin.py --debug
+# 登录后导航到第一个关键词页面，保存 debug_linkedin.html，立即返回
+```
+用于在 LinkedIn 改版后重新分析 DOM 结构。
 
 **Test**:
 ```bash
 python -c "from scrapers.linkedin import scrape_linkedin; posts = scrape_linkedin(['PhD career transition'], 5); print(len(posts), 'posts')"
+# 或直接运行（全量）
+python scrapers/linkedin.py
+# debug 模式（只捕获 DOM）
+python scrapers/linkedin.py --debug
 ```
 
 ---
@@ -892,6 +938,11 @@ python main.py --report-only      # 只重新生成报告
 | 坑 | 原因 | 解法 |
 |----|------|------|
 | LinkedIn 检测 headless | 自动化检测 | headless=False + `--disable-blink-features=AutomationControlled` |
+| LinkedIn 已登录但仍尝试填表 | Google SSO 保持登录，跳转直接到 /feed | `goto` 后先检查 `/feed` in `page.url`，已登录则跳过表单 |
+| LinkedIn 主页无 email 输入框 | 新版主页默认显示 Google SSO 按钮 | 先点 "Sign in with email" 按钮再填表；用 `data-tracking-control-name` 或 `text=` 定位 |
+| LinkedIn 搜索页等待 networkidle 超时 | LinkedIn 有持续后台 XHR，networkidle 永远不触发 | 改用 `domcontentloaded` + `time.sleep(3)` |
+| LinkedIn selector 全部失效 | LinkedIn 迁移到 SDUI，class 名全部混淆（如 `_27d29e99`） | 用 `page.evaluate()` JS traversal，依赖 `href` 属性而非 class 名；等待用 `data-sdui-screen*="SearchResultsContent"` |
+| LinkedIn DOM 再次改版 | LinkedIn 经常更新 | 运行 `python scrapers/linkedin.py --debug` 保存 `debug_linkedin.html`，重新分析结构 |
 | Blind 首次登录 CAPTCHA | 新 browser profile | headless=False 手动解一次，之后保存 browser state |
 | Twitter API 429 | 超过 rate limit | 每个 query 之间 time.sleep(2)，减少 max_per_query |
 | Claude 返回带 ```json 的响应 | Claude 有时加围栏 | strip 后再 json.loads() |
@@ -932,3 +983,4 @@ python main.py --report-only      # 只重新生成报告
 | 2026-03 | 1.0 | 初版 |
 | 2026-03 | 2.0 | 按 STANDARD.md 重构，统一格式 |
 | 2026-03 | 3.0 | Phase 顺序改为按客群价值排序（对照 02-platforms.md）；新增 Twitter/X、小红书、The Grad Cafe scraper；main.py 新增 --high-value-only 和 --no-browser flag |
+| 2026-03 | 3.1 | Phase 2 实装修正：(1) 登录流程适配 Google SSO 保持登录场景；(2) 新增 "Sign in with email" 按钮点击（LinkedIn 主页改版）；(3) 搜索页等待从 networkidle 改为 domcontentloaded；(4) 所有 selector 改为 JS DOM traversal（LinkedIn 迁移 SDUI，class 名全混淆）；(5) 新增 debug=True / --debug 模式 |
