@@ -78,67 +78,134 @@ Scrapers (9 platforms) → SQLite → Claude API Matcher → Daily Report + Web 
 
 ## Quick Start
 
+**Step 1 — Install**
+
 ```bash
 git clone https://github.com/dongzhang84/socrates-finds-you
 cd socrates-finds-you
 
-python -m venv .venv && source .venv/bin/activate
+python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 playwright install chromium
-
-cp .env.example .env     # fill in your credentials
-python storage/db.py     # initialize database
-
-# Verify the full pipeline with free scrapers only
-python main.py --reddit-only
 ```
 
-Open the web dashboard:
+**Step 2 — Configure**
 
 ```bash
-python app.py            # → http://localhost:5000
+cp .env.example .env
+# Open .env and add your ANTHROPIC_API_KEY (only key required for the free mode)
 ```
+
+**Step 3 — Initialize and run**
+
+```bash
+python3 storage/db.py        # create the database (one-time)
+python3 main.py --reddit-only  # scrape + match + generate report (~2 min)
+```
+
+**Step 4 — Open the dashboard**
+
+```bash
+python3 app.py               # → http://localhost:5000
+```
+
+That's it. The dashboard shows your matched leads sorted by tier. Hit **Run Pipeline** to trigger a fresh scrape from the browser.
 
 ---
 
-## Usage
+## Daily Use
+
+Once set up, your workflow is:
 
 ```bash
-# Full run — all active platforms (LinkedIn, Blind, HN, RSS, Reddit, Grad Cafe)
-python main.py
+# Option A: use the web dashboard (recommended)
+python3 app.py
+# Then click "Run Pipeline" on the page — it streams the log and reloads when done.
 
-# High-value only — LinkedIn + Blind (browser required)
-python main.py --high-value-only
-
-# No browser — HN + RSS + Reddit + Grad Cafe (best for cron / headless servers)
-python main.py --no-browser
-
-# Free scrapers only — HN + RSS + Reddit + Grad Cafe (fastest, no credentials needed)
-python main.py --reddit-only
-
-# Skip scraping — re-run Claude matching on existing unmatched signals
-python main.py --no-scrape
-
-# Skip scraping and matching — regenerate today's report from already-matched data
-python main.py --report-only
+# Option B: run from the terminal
+python3 main.py --reddit-only   # free, no browser, ~2 min
+python3 main.py --high-value-only  # LinkedIn + Blind (browser required)
+python3 main.py                    # everything
 ```
 
-Reports are saved to `output/report_YYYY-MM-DD.md`. Each run appends new signals; duplicates are silently skipped.
+**All pipeline flags:**
+
+| Flag | What runs | Credentials needed |
+|------|-----------|--------------------|
+| `--reddit-only` | HN + RSS + Reddit + Grad Cafe | `ANTHROPIC_API_KEY` only |
+| `--no-browser` | Same as above | `ANTHROPIC_API_KEY` only |
+| `--high-value-only` | LinkedIn + Blind | + LinkedIn + Blind accounts |
+| _(none)_ | All active platforms | All credentials |
+| `--no-scrape` | Skip scraping, re-run matching on existing data | `ANTHROPIC_API_KEY` |
+| `--report-only` | Regenerate report from already-matched signals | None |
+
+Reports are saved to `output/report_YYYY-MM-DD.md`. Each run deduplicates automatically — running twice a day is safe.
+
+---
+
+## Adapting for Your Own Use Case
+
+This project is hard-coded for one person's coaching business. Here's exactly what to change to make it yours.
+
+### 1. Change what Claude looks for — `matcher/claude_match.py`
+
+Open `matcher/claude_match.py` and find the `SYSTEM_PROMPT` string near the top. Replace the services list with your own:
+
+```python
+SYSTEM_PROMPT = """You are a matching assistant for [Your Name].
+
+He/she offers these services:
+
+HIGH VALUE ([your high-value client type]):
+- [Service A]
+- [Service B]
+
+MEDIUM VALUE ([your medium-value client type]):
+- [Service C]
+
+LOWER VALUE ([your lower-value client type]):
+- [Service D]
+"""
+```
+
+Claude will then match every scraped post against your services and return `service_match`, `client_tier`, `confidence`, and a one-line `reasoning`.
+
+### 2. Change where it looks — `main.py`
+
+Open `main.py` and update the keyword/subreddit constants at the top of the file:
+
+```python
+# Keywords for LinkedIn search
+LINKEDIN_KEYWORDS = [
+    "your keyword",
+    "another keyword",
+]
+
+# Subreddits to monitor (grouped by value tier in comments)
+REDDIT_SUBREDDITS = [
+    "subreddit1", "subreddit2",
+]
+
+# RSS feeds (Substack, Medium, newsletters)
+RSS_FEEDS = [
+    "https://yournewsletter.substack.com/feed",
+]
+```
+
+These are the only two files you need to edit. Everything else — scraping, storage, matching, reporting, the dashboard — works without changes.
 
 ---
 
 ## Web Dashboard
 
 ```bash
-python app.py
+python3 app.py    # → http://localhost:5000
 ```
 
-Opens at **http://localhost:5000**. Shows:
-
-- Total signals in the database
-- Matched leads from the last 48 hours grouped by tier (High / Medium / Low)
-- Per-lead: title (linked), platform + subreddit, service match, confidence badge, reasoning
-- **Run Pipeline** button — triggers `python main.py --reddit-only` in the background with a live log stream, then auto-reloads when done
+- Matched leads from the last 48 hours, grouped by tier
+- Per-lead: title (clickable link), platform, service match, confidence, reasoning
+- **Run Pipeline** button — streams the live log, auto-reloads when done
+- Stats bar: total signals in DB, high / medium / low counts
 
 ---
 
