@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-03-16 18:50 UTC  
+**Generated:** 2026-03-16 18:52 UTC  
 **Showing:** last 3 week(s) of 3 total  
 
 ---
@@ -11,14 +11,15 @@
 |------|-------|
 | Status | ❌ Stalled |
 | Active days | 1 / 7 |
-| Total commits | 4 |
+| Total commits | 5 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| **4** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+| **5** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 
 **Mon – Monday, Mar 16**
 
+- `0ffd7d4` feat: add Hacker News scraper — _dongzhang84_ `2026-03-16 11:52`
 - `cd573c7` feat: add Twitter/X scraper — _dongzhang84_ `2026-03-16 11:50`
 - `bc15160` feat: add Blind scraper — _dongzhang84_ `2026-03-16 11:20`
 - `19616be` update implementation guide — _dongzhang84_ `2026-03-16 01:17`
