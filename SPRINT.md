@@ -1,11 +1,29 @@
 # Sprint Report
 
-**Generated:** 2026-03-15 22:42 UTC  
-**Showing:** last 2 week(s) of 2 total  
+**Generated:** 2026-03-16 08:13 UTC  
+**Showing:** last 3 week(s) of 3 total  
 
 ---
 
-## Week 2 _(current)_ · 2026-03-09 to 2026-03-15
+## Week 3 _(current)_ · 2026-03-16 to 2026-03-22
+
+| Stat | Value |
+|------|-------|
+| Status | ❌ Stalled |
+| Active days | 1 / 7 |
+| Total commits | 1 |
+
+| Mon | Tue | Wed | Thu | Fri | Sat | Sun |
+|---|---|---|---|---|---|---|
+| **1** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+
+**Mon – Monday, Mar 16**
+
+- `46e23ce` feat: add LinkedIn scraper — _dongzhang84_ `2026-03-16 01:12`
+
+---
+
+## Week 2 · 2026-03-09 to 2026-03-15
 
 | Stat | Value |
 |------|-------|
