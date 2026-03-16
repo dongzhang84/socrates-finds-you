@@ -26,7 +26,7 @@ Scrapers (9 platforms) → SQLite → Claude API Matcher → Daily Report + Web 
 
 > _Web dashboard — leads grouped by tier with service match, confidence, and reasoning_
 
-![Dashboard placeholder](docs/screenshot.png)
+![Dashboard](images/screenshot_1.png)
 
 ```
 # socrates-finds-you — Daily Report 2026-03-16
