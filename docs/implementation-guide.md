@@ -394,111 +394,78 @@ python scrapers/linkedin.py --debug
 
 ---
 
-**CC Prompt 3 — Blind scraper:**
+**实际实现说明（与原始 spec 有出入，调试后修正）**
 
-```
-Create scrapers/blind.py for socrates-finds-you.
+**问题 1：`page.goto()` 超时**
 
-Use Playwright sync API.
+与 LinkedIn 相同根因：Blind 有持续后台 XHR，默认 `load` 事件永远不触发。
 
-Export: scrape_blind(max_posts: int = 30) → list[dict]
+修复：所有 `page.goto()` 调用加 `wait_until="domcontentloaded"`，同时加 `--start-maximized` 和 `no_viewport=True`。
 
-Logic:
-1. Load BLIND_EMAIL and BLIND_PASSWORD from .env
-2. Launch Chromium headless=False
-   args: ["--disable-blink-features=AutomationControlled"]
-3. Navigate to https://www.teamblind.com
-4. Fill login form and submit
-5. Wait for feed: wait_for_selector("[data-testid='feed']" or similar, timeout=15000)
-6. Navigate to these sections one by one:
-   - /topics/Career
-   - /topics/Job-Search
-   - /topics/Career-Advice
-   - /topics/AI-Machine-Learning
-7. For each section: scroll once (page.evaluate("window.scrollBy(0, 1500)")),
-   collect post cards (title + URL + timestamp)
-8. Deduplicate by URL, limit to max_posts total
-9. For each post: navigate to URL, extract full body text, go back
-   Delay: time.sleep(random.uniform(1.5, 3.5)) between posts
-10. Return list of dicts:
-  {
-    "platform": "blind",
-    "external_id": slug extracted from URL,
-    "url": full post URL,
-    "title": title text,
-    "body": body text[:2000],
-    "author": author if visible else "",
-    "subreddit": None,
-    "posted_at": parsed timestamp or None
-  }
+**问题 2：48h 年龄过滤把所有 post 都过滤掉**
 
-Filter: skip posts older than 48 hours.
-Wrap all in try/except — return partial results on failure.
-Log: [blind] {N} posts scraped
-```
+Blind 的 topic 页面显示的是 popular posts，不是实时 feed——实测 timestamp 都是 5-7 天前。`CUTOFF_HOURS=48` 导致 0 结果。
+
+修复：`CUTOFF_HOURS = 168`（7 天）。
+
+**问题 3：DOM selector 全部失效**
+
+原始 spec 依赖 `[data-testid='feed']` 等假设选择器。实际调试（`--debug` 捕获 DOM）发现真实结构：
+
+| 元素 | 实际 Selector（2026-03 验证） |
+|------|------|
+| 登录检测 | `input[type="email"]` 是否存在 |
+| Post card（完整 wrapper） | `a[href*="/post/"]` — anchor 本身就是 card |
+| 标题 | `[data-testid="popular-article-preview-title"]` |
+| 时间戳 | `p.text-gray-600`，值为 `"6d"`、`"Mar 7"` 等 |
+| 正文（post 页内） | `article`、`[role="main"]`、`main` 取最长文本 |
+| 作者 | Blind 匿名，author 字段返回空字符串 |
+
+**时间戳解析**：两种格式都需处理——
+- 相对：`"5d"`, `"2h"`, `"1w"` → timedelta 计算
+- 绝对：`"Mar 7"` → strptime，年份用当前年，若未来则减一年
+
+**两阶段抓取**：先批量收集 stub（url+title+timestamp），过滤后再逐个 fetch 正文，避免对过期 post 发请求。
+
+**Debug 模式**：`scrape_blind(debug=True)` 或 `python scrapers/blind.py --debug` → 保存 `debug_blind.html`，立即退出。
+
+**稳定 selector 汇总（2026-03 验证）**：
+
+| 元素 | Selector |
+|------|----------|
+| 页面加载等待 | `wait_until="domcontentloaded"` + `time.sleep(2)` |
+| Topic URL 重定向 | `/topics/Career` → `/channels/Career`（自动跟随） |
+| Post card | `a[href*="/post/"]` |
+| 标题 | `[data-testid="popular-article-preview-title"]` |
+| 时间戳 | `p.text-gray-600` |
+| 正文（post 页） | `article` / `[role="main"]` / `main` 取最长 innerText |
 
 **Test**:
 ```bash
 python -c "from scrapers.blind import scrape_blind; posts = scrape_blind(3); print(len(posts), 'posts')"
+# debug 模式
+python scrapers/blind.py --debug
 ```
 
 ---
 
-### Phase 4: Twitter/X Scraper (tweepy) ⭐ 高价值
+### Phase 4: Twitter/X Scraper (tweepy) ⭐ 高价值 — ⛔ 已禁用
 
 **Goal**: 抓取 AcademicTwitter 圈子里的转行、AI 学习讨论。
 
-> ⚠️ Twitter API v2 免费 tier 有限制（每月 500k reads）。需要申请 developer account。
+> ⛔ **已禁用**：Twitter API credits 费用过高，暂停使用。`scrapers/twitter.py` 已写好但在 `main.py` 中注释掉。重新启用时取消 `main.py` 中的两处注释（`TWITTER_QUERIES` 常量 + scraper 调用块）。
 
----
+`scrapers/twitter.py` 实现要点：
+- `tweepy.Client(bearer_token=..., wait_on_rate_limit=True)` — 自动处理 429
+- 用 `response.includes["users"]` dict 做 author_id → username 映射
+- 每个 query 之间 `time.sleep(2)` 礼貌延迟
+- 按 tweet id 去重，按 `created_at` 过滤 48h 内
 
-**CC Prompt 4 — Twitter/X scraper:**
-
-```
-Create scrapers/twitter.py for socrates-finds-you.
-
-Use tweepy with Twitter API v2 Bearer Token.
-Install: pip install tweepy
-Load TWITTER_BEARER_TOKEN from .env.
-
-Export: scrape_twitter(queries: list[str], max_per_query: int = 50) → list[dict]
-
-Logic:
-1. Initialize tweepy.Client(bearer_token=TWITTER_BEARER_TOKEN)
-2. For each query string:
-   - Use client.search_recent_tweets(
-       query=f"{query} -is:retweet lang:en",
-       max_results=min(max_per_query, 100),
-       tweet_fields=["created_at", "author_id", "text", "public_metrics"],
-       expansions=["author_id"],
-       user_fields=["username"]
-     )
-   - Filter: skip tweets older than 48 hours
-   - Delay: time.sleep(2) between queries (rate limit respect)
-3. Deduplicate by tweet id
-4. Return list of dicts:
-  {
-    "platform": "twitter",
-    "external_id": str(tweet.id),
-    "url": f"https://twitter.com/i/web/status/{tweet.id}",
-    "title": tweet.text[:120],
-    "body": tweet.text[:2000],
-    "author": username from expansions,
-    "subreddit": None,
-    "posted_at": tweet.created_at.isoformat()
-  }
-
-Default queries (from main.py):
-  ["PhD leaving academia", "PhD to industry", "academic to industry transition",
-   "learning machine learning career", "AI career change",
-   "SAT tutor math", "AP calculus help", "STEM mentor high school"]
-
-Wrap each query in try/except. Log: [twitter] {N} tweets fetched
-```
-
-**Test**:
-```bash
-python -c "from scrapers.twitter import scrape_twitter; posts = scrape_twitter(['PhD leaving academia'], 10); print(len(posts), 'tweets')"
+**若需重新启用**：
+```python
+# main.py 中取消注释：
+TWITTER_QUERIES = ["PhD leaving academia", ...]
+# 以及 run_scraping() 中的 Twitter 调用块
 ```
 
 ---
@@ -507,38 +474,12 @@ python -c "from scrapers.twitter import scrape_twitter; posts = scrape_twitter([
 
 **Goal**: HN 技术圈，完全免费，无需 auth。
 
----
+**实现与 spec 完全一致，无偏差。** 实际运行 ~2s 取回 40-50 条符合条件的 stories（100 条 ID 并发 fetch，过滤后约 40-50%）。
 
-**CC Prompt 5 — HN scraper:**
-
-```
-Create scrapers/hackernews.py for socrates-finds-you.
-
-Use HN public Firebase REST API. No auth needed.
-
-Export: scrape_hn(limit: int = 100) → list[dict]
-
-Logic:
-- GET https://hacker-news.firebaseio.com/v0/newstories.json → list of IDs
-- Take first {limit} IDs
-- Fetch each: https://hacker-news.firebaseio.com/v0/item/{id}.json
-- Use concurrent.futures.ThreadPoolExecutor(max_workers=10)
-- Filter: None/deleted, type != "story", score < 2, older than 48h, no title
-- Strip HTML from text field using html.parser (stdlib)
-- Return list of dicts:
-  {
-    "platform": "hn",
-    "external_id": str(item["id"]),
-    "url": f"https://news.ycombinator.com/item?id={item['id']}",
-    "title": item["title"],
-    "body": cleaned_text[:2000],
-    "author": item.get("by", ""),
-    "subreddit": None,
-    "posted_at": datetime.utcfromtimestamp(item["time"]).isoformat()
-  }
-
-Log: [hn] {N} stories fetched
-```
+关键实现细节：
+- `ThreadPoolExecutor(max_workers=10)` 并发 fetch，不保证顺序（`as_completed`）
+- 过滤链：deleted/dead → type != story → no title → score < 2 → older than 48h
+- `body` 来自 item 的 `text` 字段（Ask HN 类型有，普通链接没有）
 
 **Test**:
 ```bash
@@ -551,40 +492,31 @@ python -c "from scrapers.hackernews import scrape_hn; posts = scrape_hn(20); pri
 
 **Goal**: 订阅职场转型、AI 学习类 newsletter 的评论和文章。
 
----
+**实际实现说明**
 
-**CC Prompt 6 — RSS scraper:**
+**问题：`feedparser.parse(url)` SSL 证书验证失败（macOS）**
 
+macOS 系统 Python 的 SSL 证书链不完整，`feedparser` 用 urllib 直接 fetch URL 会报 `CERTIFICATE_VERIFY_FAILED`。
+
+修复：先用 `requests.get()` fetch 内容，再传 bytes 给 `feedparser.parse(resp.content)`：
+```python
+resp = requests.get(feed_url, timeout=15, headers={"User-Agent": "Mozilla/5.0"})
+parsed = feedparser.parse(resp.content)  # 传 bytes，不传 URL
 ```
-Create scrapers/rss.py for socrates-finds-you.
 
-Install: pip install feedparser
+**已知 feed 状态（2026-03 验证）**：
 
-Export: scrape_rss(feeds: list[str], max_age_hours: int = 48) → list[dict]
+| Feed | 状态 |
+|------|------|
+| `every.to/feed` | ❌ 404，URL 已失效 |
+| `lennysnewsletter.com/feed` | ✅ 正常，返回 3 条/48h |
+| `oneusefulthing.org/feed` | ✅ 正常（发布频率低，48h 内常为 0） |
 
-Logic:
-- For each feed URL: feedparser.parse(url)
-- Filter entries older than max_age_hours
-- Strip HTML from entry.summary using html.parser
-- Return list of dicts:
-  {
-    "platform": "rss",
-    "external_id": entry.get("id") or hashlib.md5(entry.get("link","").encode()).hexdigest()[:12],
-    "url": entry.get("link", ""),
-    "title": entry.get("title", ""),
-    "body": cleaned_summary[:2000],
-    "author": entry.get("author", ""),
-    "subreddit": None,
-    "posted_at": entry.get("published", None)
-  }
+`external_id` 处理：entry id 若超过 64 字符（常见于 Substack URL 格式），hash 为 12 位 MD5。
 
-Handle per-feed errors with try/except.
-Log: [rss] {feed_url}: {N} entries fetched
-
-Default feeds (from main.py):
-  ["https://every.to/feed",
-   "https://www.lennysnewsletter.com/feed",
-   "https://www.oneusefulthing.org/feed"]
+**Test**:
+```bash
+python -c "from scrapers.rss import scrape_rss; posts = scrape_rss(); print(len(posts), 'entries')"
 ```
 
 ---
@@ -634,47 +566,26 @@ Default keywords (from main.py):
 Wrap all in try/except. Log: [xiaohongshu] {N} posts scraped
 ```
 
----
-
-### Phase 8: Reddit Scraper (PRAW)
-
-**Goal**: PRAW 官方 API，覆盖 PhD 转行、职场 AI、高中生等多个 subreddit。
+> ⚠️ **小红书 scraper 尚未实现**（`scrapers/xiaohongshu.py` 不存在）。`main.py` 中调用被 try/except 包裹，失败时 log warning 继续。
 
 ---
 
-**CC Prompt 8 — Reddit scraper:**
+### Phase 8: Reddit Scraper (公开 JSON API)
+
+**Goal**: 覆盖 PhD 转行、职场 AI、高中生等多个 subreddit。
+
+**实际实现说明**
+
+原始 spec 使用 PRAW，但 Reddit 不再允许新应用注册。改用公开 JSON API，**无需任何认证**：
 
 ```
-Create scrapers/reddit.py for socrates-finds-you.
-
-Use PRAW with REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET, REDDIT_USER_AGENT from .env.
-
-Export: scrape_reddit(subreddits: list[str], limit_per_sub: int = 50) → list[dict]
-
-Logic:
-- reddit = praw.Reddit(..., read_only=True)
-- For each subreddit: subreddit.new(limit=limit_per_sub)
-- Filter: older than 48h, stickied, body is "[removed]" or "[deleted]"
-- Return list of dicts:
-  {
-    "platform": "reddit",
-    "external_id": f"t3_{submission.id}",
-    "url": f"https://reddit.com{submission.permalink}",
-    "title": submission.title,
-    "body": submission.selftext[:2000],
-    "author": str(submission.author),
-    "subreddit": submission.subreddit.display_name,
-    "posted_at": datetime.utcfromtimestamp(submission.created_utc).isoformat()
-  }
-
-Wrap each subreddit in try/except.
-Log: [reddit] r/{subreddit}: {N} posts | Total: {N} posts
-
-Subreddits by tier (pass from main.py, in priority order):
-  TIER_HIGH:   ["PhD", "AskAcademia", "datascience", "MachineLearning"]
-  TIER_MEDIUM: ["cscareerquestions", "learnmachinelearning", "GradSchool"]
-  TIER_LOW:    ["SAT", "ApplyingToCollege", "learnpython"]
+GET https://www.reddit.com/r/{subreddit}/new.json?limit=50
+Headers: {"User-Agent": "socrates-finds-you/1.0"}
 ```
+
+额外过滤（spec 未提）：作者为 `[deleted]` 或 `AutoModerator` 的 post 跳过。
+
+实测产量：10 个 subreddit，每次约 380 条 posts（48h 内），是最高产量的 scraper。
 
 **Test**:
 ```bash
@@ -687,38 +598,32 @@ python -c "from scrapers.reddit import scrape_reddit; posts = scrape_reddit(['Ph
 
 **Goal**: PhD 群体转型讨论密集，和 Reddit r/PhD 并列。
 
----
+**实际实现说明**
 
-**CC Prompt 9 — The Grad Cafe scraper:**
+**问题：Forum 18 不再是 Career Advice**
 
-```
-Create scrapers/gradcafe.py for socrates-finds-you.
+`/forum/18-career-advice/` 重定向到 `/forum/18-city-guide/`（City Guide 板块）。
 
-Use requests + html.parser (stdlib). No auth needed.
+实际使用的论坛：
+- **Forum 72** (`/forum/72-jobs/`) — Jobs
+- **Forum 21** (`/forum/21-officially-grads/`) — Officially Grads
 
-Export: scrape_gradcafe(max_posts: int = 30) → list[dict]
+**DOM 结构（2026-03 验证）**：
 
-Logic:
-1. GET https://forum.thegradcafe.com/forum/18-career-advice/ (Career Advice section)
-   Headers: {"User-Agent": "Mozilla/5.0"}
-2. Parse thread list with html.parser — extract thread titles + URLs
-3. Filter threads older than 7 days (Grad Cafe moves slower than Reddit)
-4. For each thread URL: GET page, extract first post body
-   time.sleep(random.uniform(1.0, 2.5)) between requests
-5. Limit to max_posts
-6. Return list of dicts:
-  {
-    "platform": "gradcafe",
-    "external_id": slug from URL,
-    "url": full thread URL,
-    "title": thread title,
-    "body": first post body[:2000],
-    "author": OP username,
-    "subreddit": None,
-    "posted_at": parsed date or None
-  }
+| 元素 | Selector / 属性 |
+|------|------|
+| Thread link | `a[href*="/topic/"]` inside `h4.ipsDataItem_title` |
+| 时间戳 | `<time datetime="2024-06-04T16:24:46Z">` — ISO in `datetime` attribute |
+| 作者 | `<a href="/profile/...">` in `div.ipsDataItem_meta`（实测常为空，whitespace 问题）|
+| 正文 | 第一个 `<div data-role="commentContent">` |
 
-Wrap all in try/except. Log: [gradcafe] {N} threads scraped
+两个 stdlib `html.parser` 状态机：`_ThreadListParser`（列表页）和 `_PostBodyParser`（帖子页）。
+
+> ⚠️ **Author 字段实测为空**：GradCafe 的 HTML 在 author anchor 内有多层 whitespace text node，解析器捕获不到。`author` 字段返回 `""`，不影响功能。
+
+**Test**:
+```bash
+python -c "from scrapers.gradcafe import scrape_gradcafe; posts = scrape_gradcafe(5); print(len(posts), 'threads')"
 ```
 
 ---
@@ -781,6 +686,34 @@ Handle parse errors: log and skip batch.
 Log: [matcher] Batch {N}: {M}/{K} matched
 Log: [matcher] Total: {matched}/{total} matched
 ```
+
+**实际实现说明**
+
+**问题 1：Claude 可能重排返回数组**
+
+如果按数组索引位置合并结果，一旦 Claude 返回顺序与输入不同就会错位。
+
+修复：按 `id` 字段合并，把结果建成 `{id: result}` dict，再遍历原始 signals 做 patch：
+```python
+result_map = {r["id"]: r for r in parsed_results if "id" in r}
+for s in batch:
+    if s["id"] in result_map:
+        s.update(result_map[s["id"]])
+```
+
+**问题 2：Claude 返回带 ` ```json ``` ` 围栏**
+
+尽管 prompt 明确要求 "Return a JSON array only. No other text."，Claude 有时仍加围栏。
+
+修复：`_strip_fences()` 用正则在 `json.loads()` 前清洗：
+```python
+def _strip_fences(text: str) -> str:
+    return re.sub(r"^```(?:json)?\s*|\s*```$", "", text.strip(), flags=re.MULTILINE)
+```
+
+**问题 3：单批解析失败不应中止整个 run**
+
+per-batch try/except 同时捕获 `json.JSONDecodeError` 和通用 `Exception`，均 `continue` 跳到下一批，确保部分失败不影响其他批次。
 
 **Test**:
 ```bash
@@ -847,6 +780,14 @@ Logic:
 Log: [reporter] Saved: output/report_{date}.md ({N} leads)
 ```
 
+**实际实现说明**
+
+**行为与 spec 基本一致，以下几点值得注意：**
+
+- **零信号情况**：`get_report_candidates()` 返回空列表时仍正常生成报告，内容为 `*No leads today. Run again tomorrow.*`，文件依然写入 `output/report_YYYY-MM-DD.md`。
+- **排序**：`TIER_ORDER = {"high": 0, "medium": 1, "low": 2}` 在 Python 层 sort，不依赖 SQL ORDER BY（SQL 按字母排会导致 high/low/medium 错序）。
+- **`generate_report()` 返回值**：返回 `str`（路径），`main.py` 用于最终日志打印。
+
 ---
 
 ### Phase 12: Main Entry Point
@@ -893,10 +834,31 @@ argparse flags:
 Log: [main] Done in {elapsed:.1f}s — {N} new signals, {M} matched, report saved
 ```
 
+**实际实现说明**
+
+**偏差 1：Twitter 已禁用**
+
+`TWITTER_QUERIES` 常量和 scraper 调用均已注释掉，注释内容为 `# Twitter disabled — API credits too expensive, re-enable when needed.`。`--high-value-only` 实际只跑 LinkedIn + Blind（不含 Twitter）。
+
+**偏差 2：`id` 字段在 main.py 中拼接，scraper 不负责**
+
+各 scraper 只返回 `platform` 和 `external_id`，不设置 `id`。`main.py` 在 `save_signals()` 前统一拼接：
+```python
+for s in all_signals:
+    if "id" not in s:
+        s["id"] = f"{s['platform']}:{s['external_id']}"
+```
+
+**偏差 3：增加详细进度日志**
+
+原始 spec 只要求最终 summary log。实际实现在每个 scraper 开始前和结束后都有 `logger.info()`，Claude matching 开始前也有日志，避免运行时"无声静止"（matching 阶段约需 2 分钟无输出）。
+
+**`--reddit-only` 实际行为**：跑 HN + RSS + Reddit + GradCafe（所有无浏览器 API scrapers）。Twitter 禁用后，此 flag 是最稳定、无成本的测试方式。
+
 **Run options**:
 ```bash
-python main.py                  # 全量，所有平台
-python main.py --high-value-only  # 只跑 LinkedIn + Blind + Twitter
+python main.py                    # 全量，所有平台（Twitter 已禁用）
+python main.py --high-value-only  # 只跑 LinkedIn + Blind（Twitter 已禁用）
 python main.py --no-browser       # 跳过 Playwright，适合 cron / 无 GUI 环境
 python main.py --reddit-only      # 只跑免费无风险的平台，适合测试
 python main.py --no-scrape        # 重新匹配已抓取的数据
@@ -952,6 +914,14 @@ python main.py --report-only      # 只重新生成报告
 | Playwright 在 cron 无 GUI | headless=False 在无 display 环境报错 | cron 里用 --no-browser flag |
 | 信号量太多导致 Claude 超时 | 一次送太多 | limit=150，batch size=10 |
 | Grad Cafe 结构变化 | HTML 结构随时可能改 | 用 try/except，定期检查 scraper 是否还能跑 |
+| Blind `page.goto()` 超时 | 与 LinkedIn 相同：Blind 有持续后台 XHR，默认 `load` 事件永远不触发 | 所有 `page.goto()` 加 `wait_until="domcontentloaded"` + `time.sleep(2)` |
+| Blind 0 条结果 | Blind 显示的是 popular posts（5-7 天前），48h 截止过滤全部清空 | 改为 `CUTOFF_HOURS = 168`（7 天）|
+| Blind selector 失效 | 原始 spec 使用假设 selector，实际 DOM 不同 | 用 `--debug` 捕获真实 DOM，实测 selector：card=`a[href*="/post/"]`，标题=`[data-testid="popular-article-preview-title"]` |
+| RSS SSL 证书失败（macOS） | macOS Python SSL 链不完整，`feedparser.parse(url)` 用 urllib 会报 `CERTIFICATE_VERIFY_FAILED` | 先用 `requests.get()` fetch，再 `feedparser.parse(resp.content)` 传 bytes 而非 URL |
+| Reddit PRAW 无法注册新应用 | Reddit 不再允许新 app 注册 | 改用公开 `.json` API：`reddit.com/r/{sub}/new.json`，无需任何认证 |
+| Grad Cafe Forum 18 不是 Career Advice | Forum 18 已变更为 City Guide | 改用 Forum 72 (Jobs) + Forum 21 (Officially Grads) |
+| main.py 运行时无任何输出 | matching 阶段 Claude API 调用约 2 分钟，缺少进度日志 | 在每个 scraper 开始/结束、matching 开始前加 `logger.info()`，明确可见每步进度 |
+| Claude 按数组位置合并结果出错 | Claude 偶尔调整返回数组顺序 | 改为按 `id` 字段建 dict 合并，而非依赖数组索引位置 |
 
 ---
 
@@ -984,3 +954,4 @@ python main.py --report-only      # 只重新生成报告
 | 2026-03 | 2.0 | 按 STANDARD.md 重构，统一格式 |
 | 2026-03 | 3.0 | Phase 顺序改为按客群价值排序（对照 02-platforms.md）；新增 Twitter/X、小红书、The Grad Cafe scraper；main.py 新增 --high-value-only 和 --no-browser flag |
 | 2026-03 | 3.1 | Phase 2 实装修正：(1) 登录流程适配 Google SSO 保持登录场景；(2) 新增 "Sign in with email" 按钮点击（LinkedIn 主页改版）；(3) 搜索页等待从 networkidle 改为 domcontentloaded；(4) 所有 selector 改为 JS DOM traversal（LinkedIn 迁移 SDUI，class 名全混淆）；(5) 新增 debug=True / --debug 模式 |
+| 2026-03 | 3.2 | 全部模块实装修正：Phase 3 (Blind) domcontentloaded + CUTOFF_HOURS=168 + 实测 selector；Phase 4 (Twitter) 标记为已禁用；Phase 5 (HN) 确认与 spec 一致；Phase 6 (RSS) macOS SSL 修复（requests+bytes）；Phase 7 (小红书) 标记为未实现；Phase 8 (Reddit) 从 PRAW 改为公开 JSON API；Phase 9 (Grad Cafe) Forum 18 失效改用 72+21，实测 DOM selector；Phase 10 (matcher) 按 id 合并结果 + fence stripping；Phase 11 (reporter) 零信号情况处理；Phase 12 (main.py) Twitter 禁用 + id 拼接位置 + 全程进度日志；常见坑表新增 9 条实测 bug |
