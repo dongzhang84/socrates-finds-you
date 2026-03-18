@@ -8,6 +8,17 @@ All notable changes to this project are documented here.
 
 ---
 
+## [1.5.0] — 2026-03-17
+
+### Added
+- Dashboard: **LinkedIn — All Signals** section below the main leads report — shows every LinkedIn signal in the DB (matched or not) with title, URL, author, body snippet (200 chars), and a matched/unmatched badge
+
+### Changed
+- `scrapers/linkedin.py` — `max_posts` default raised from 20 → 100
+- `scrapers/blind.py` — `max_posts` default raised from 30 → 100; replaced all `/topics/` pages with more relevant `/channels/` pages: Career, Job-Search, Career-Advice, working-parents, AI-Machine-Learning, Data-Science, Software-Engineering; JS stub-collection selectors hardened with fallback chain to handle both `/topics/` and `/channels/` DOM layouts
+
+---
+
 ## [1.4.0] — 2026-03-17
 
 ### Added

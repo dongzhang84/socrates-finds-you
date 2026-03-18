@@ -207,6 +207,7 @@ python3 app.py    # → http://localhost:8080
 - Per-lead: title (clickable link), platform, service match, confidence, reasoning, and a **suggested reply** with a one-click Copy button
 - **Run Pipeline** button — runs the full pipeline, streams the live log, auto-reloads when done
 - Stats bar: total signals in DB, high / medium / low counts
+- **LinkedIn — All Signals** section — shows every LinkedIn signal (matched or not) with title, author, body snippet, and matched status
 
 ---
 
@@ -216,7 +217,7 @@ python3 app.py    # → http://localhost:8080
 socrates-finds-you/
 ├── scrapers/
 │   ├── linkedin.py          # Playwright — login + keyword search + JS DOM traversal
-│   ├── blind.py             # Playwright — Career/Job topics, 7-day window
+│   ├── blind.py             # Playwright — Career/Job channels, 7-day window
 │   ├── hackernews.py        # Firebase REST API, concurrent fetch (ThreadPoolExecutor)
 │   ├── rss.py               # feedparser via requests (macOS SSL workaround)
 │   ├── reddit.py            # Public reddit.com/r/{sub}/new.json — no auth needed
