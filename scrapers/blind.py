@@ -13,14 +13,13 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 TOPICS = [
-    "/topics/Career",
-    "/topics/Job-Search",
-    "/topics/Career-Advice",
-    "/topics/AI-Machine-Learning",
-    "/topics/Tech",
-    "/topics/Software-Engineer",
-    "/topics/Data-Science",
-    "/topics/Artificial-Intelligence",
+    "/channels/Career",
+    "/channels/Job-Search",
+    "/channels/Career-Advice",
+    "/channels/working-parents",
+    "/channels/AI-Machine-Learning",
+    "/channels/Data-Science",
+    "/channels/Software-Engineering",
 ]
 
 BASE_URL = "https://www.teamblind.com"
@@ -165,13 +164,16 @@ def scrape_blind(max_posts: int = 100, debug: bool = False) -> list[dict]:
                             const url = card.href.split('?')[0];
                             if (!url || seen.has(url)) continue;
 
-                            // Title: data-testid attribute (reliable as of 2026-03)
-                            const titleEl = card.querySelector('[data-testid="popular-article-preview-title"]');
+                            // Title: try /topics/ testid first, then broader fallbacks for /channels/
+                            const titleEl = card.querySelector('[data-testid="popular-article-preview-title"]')
+                                         || card.querySelector('[data-testid*="title"]')
+                                         || card.querySelector('h2, h3, [class*="title"], [class*="Title"]');
                             const title = (titleEl ? titleEl.innerText : card.innerText).trim().split('\\n')[0];
                             if (!title || title.length < 5) continue;
 
-                            // Timestamp: <p class="text-xs text-gray-600"> e.g. "6d", "Mar 7"
-                            const tsEl = card.querySelector('p.text-gray-600');
+                            // Timestamp: try both /topics/ and /channels/ class patterns
+                            const tsEl = card.querySelector('p.text-gray-600')
+                                      || card.querySelector('[class*="gray"] p, [class*="date"], [class*="time"]');
                             const postedAt = tsEl ? tsEl.innerText.trim() : '';
 
                             seen.add(url);
