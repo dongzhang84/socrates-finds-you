@@ -36,11 +36,17 @@ def init_db() -> None:
                 client_tier TEXT,
                 confidence TEXT,
                 reasoning TEXT,
+                suggested_reply TEXT,
                 included_in_report BOOLEAN DEFAULT FALSE,
                 actioned BOOLEAN DEFAULT FALSE,
                 UNIQUE(platform, external_id)
             )
         """)
+        # Migrate existing DBs that predate the suggested_reply column
+        try:
+            conn.execute("ALTER TABLE signals ADD COLUMN suggested_reply TEXT")
+        except Exception:
+            pass  # Column already exists
         conn.commit()
 
 
@@ -101,15 +107,40 @@ def update_match_result(
     client_tier: str,
     confidence: str,
     reasoning: str,
+    suggested_reply: str | None = None,
 ) -> None:
     with _connect() as conn:
         conn.execute(
             """
             UPDATE signals
-            SET matched = ?, service_match = ?, client_tier = ?, confidence = ?, reasoning = ?
+            SET matched = ?, service_match = ?, client_tier = ?, confidence = ?,
+                reasoning = ?, suggested_reply = ?
             WHERE id = ?
             """,
-            (matched, service_match, client_tier, confidence, reasoning, id),
+            (matched, service_match, client_tier, confidence, reasoning, suggested_reply, id),
+        )
+        conn.commit()
+
+
+def get_matched_without_reply(limit: int = 500) -> list[dict]:
+    with _connect() as conn:
+        rows = conn.execute(
+            """
+            SELECT * FROM signals
+            WHERE matched = TRUE AND (suggested_reply IS NULL OR suggested_reply = '')
+            ORDER BY scraped_at DESC
+            LIMIT ?
+            """,
+            (limit,),
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def update_suggested_reply(id: str, suggested_reply: str) -> None:
+    with _connect() as conn:
+        conn.execute(
+            "UPDATE signals SET suggested_reply = ? WHERE id = ?",
+            (suggested_reply, id),
         )
         conn.commit()
 

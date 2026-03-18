@@ -12,8 +12,10 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 from flask import Flask, jsonify, render_template_string
+from storage.db import init_db
 
 app = Flask(__name__)
+init_db()  # ensures schema + migrations run on every startup
 
 DB_PATH = "data/signals.db"
 OUTPUT_DIR = Path("output")
@@ -44,7 +46,7 @@ def _get_leads(hours: int = 48) -> list[dict]:
         rows = conn.execute(
             """
             SELECT id, platform, subreddit, title, url, service_match,
-                   client_tier, confidence, reasoning, posted_at, scraped_at
+                   client_tier, confidence, reasoning, suggested_reply, posted_at, scraped_at
             FROM signals
             WHERE matched = TRUE AND scraped_at >= ?
             ORDER BY scraped_at DESC
@@ -198,6 +200,19 @@ PAGE = """<!DOCTYPE html>
   .lead-reasoning { font-size: 0.82rem; color: #555; margin-top: 8px;
                     padding-top: 8px; border-top: 1px solid #f0f0f0; }
 
+  /* Suggested reply */
+  .reply-section { margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0f0; }
+  .reply-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+                 letter-spacing: 0.5px; color: #888; margin-bottom: 5px; }
+  .reply-text { font-size: 0.82rem; color: #333; line-height: 1.55;
+                background: #f8f9ff; border-left: 3px solid #93c5fd;
+                padding: 8px 10px; border-radius: 0 6px 6px 0; white-space: pre-wrap; }
+  .copy-btn { margin-top: 6px; padding: 3px 10px; font-size: 0.75rem; font-weight: 500;
+              background: #fff; border: 1px solid #d1d5db; border-radius: 5px;
+              cursor: pointer; color: #555; transition: all 0.15s; }
+  .copy-btn:hover { background: #f0f0f0; border-color: #aaa; }
+  .copy-btn.copied { background: #d1fae5; border-color: #6ee7b7; color: #065f46; }
+
   /* Empty state */
   .empty { text-align: center; padding: 48px 20px; color: #888; font-size: 0.9rem; }
   .empty p { margin-bottom: 8px; }
@@ -270,6 +285,13 @@ PAGE = """<!DOCTYPE html>
         {% if lead.reasoning %}
         <div class="lead-reasoning">{{ lead.reasoning }}</div>
         {% endif %}
+        {% if lead.suggested_reply %}
+        <div class="reply-section">
+          <div class="reply-label">Suggested reply</div>
+          <div class="reply-text" id="reply-{{ loop.index0 }}-{{ tier }}">{{ lead.suggested_reply }}</div>
+          <button class="copy-btn" onclick="copyReply('reply-{{ loop.index0 }}-{{ tier }}', this)">Copy</button>
+        </div>
+        {% endif %}
       </div>
       {% endfor %}
     {% else %}
@@ -319,6 +341,15 @@ function runPipeline() {
       btn.innerHTML = '▶ Run Pipeline';
       status.textContent = 'Request failed';
     });
+}
+
+function copyReply(id, btn) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
 }
 
 function pollStatus() {

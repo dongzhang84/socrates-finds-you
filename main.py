@@ -69,6 +69,8 @@ def parse_args() -> argparse.Namespace:
                       help="Skip scraping, re-run matching + report on existing data")
     mode.add_argument("--report-only", action="store_true",
                       help="Skip scraping and matching, just regenerate report")
+    mode.add_argument("--fix-replies", action="store_true",
+                      help="Generate suggested_reply for matched signals that are missing one")
     return p.parse_args()
 
 
@@ -175,10 +177,31 @@ def run_matching(unmatched: list[dict]) -> int:
             client_tier=s.get("client_tier"),
             confidence=s.get("confidence"),
             reasoning=s.get("reasoning"),
+            suggested_reply=s.get("suggested_reply"),
         )
         if s["matched"]:
             count += 1
     return count
+
+
+def run_fix_replies() -> None:
+    from matcher.claude_match import generate_replies
+    from storage.db import get_matched_without_reply, update_suggested_reply
+
+    signals = get_matched_without_reply()
+    if not signals:
+        logger.info("[fix-replies] No matched signals missing a suggested_reply.")
+        return
+
+    logger.info("[fix-replies] Generating replies for %d signals...", len(signals))
+    updated = generate_replies(signals)
+    count = 0
+    for s in updated:
+        reply = s.get("suggested_reply")
+        if reply:
+            update_suggested_reply(s["id"], reply)
+            count += 1
+    logger.info("[fix-replies] Done — %d/%d replies saved.", count, len(signals))
 
 
 def main() -> None:
@@ -189,6 +212,10 @@ def main() -> None:
     from reporter.daily_report import generate_report
 
     init_db()
+
+    if args.fix_replies:
+        run_fix_replies()
+        return
 
     new_signals = 0
     matched_count = 0
