@@ -97,7 +97,7 @@ def _run_pipeline():
 
     try:
         proc = subprocess.Popen(
-            ["python3", "main.py", "--reddit-only"],
+            ["python3", "main.py"],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
