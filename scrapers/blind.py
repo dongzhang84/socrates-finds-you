@@ -17,6 +17,10 @@ TOPICS = [
     "/topics/Job-Search",
     "/topics/Career-Advice",
     "/topics/AI-Machine-Learning",
+    "/topics/Tech",
+    "/topics/Software-Engineer",
+    "/topics/Data-Science",
+    "/topics/Artificial-Intelligence",
 ]
 
 BASE_URL = "https://www.teamblind.com"
@@ -83,7 +87,7 @@ def _slug_from_url(url: str) -> str:
     return parts[-1] if parts else url
 
 
-def scrape_blind(max_posts: int = 30, debug: bool = False) -> list[dict]:
+def scrape_blind(max_posts: int = 100, debug: bool = False) -> list[dict]:
     email = os.getenv("BLIND_EMAIL")
     password = os.getenv("BLIND_PASSWORD")
     if not email or not password:
@@ -267,6 +271,6 @@ if __name__ == "__main__":
     import sys
     logging.basicConfig(level=logging.INFO)
     debug_mode = "--debug" in sys.argv
-    posts = scrape_blind(max_posts=30, debug=debug_mode)
+    posts = scrape_blind(max_posts=100, debug=debug_mode)
     for p in posts:
         print(p["url"], "|", p["title"])

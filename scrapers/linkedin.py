@@ -24,7 +24,7 @@ DEFAULT_KEYWORDS = [
 ]
 
 
-def scrape_linkedin(keywords: list[str] = DEFAULT_KEYWORDS, max_posts: int = 20, debug: bool = False) -> list[dict]:
+def scrape_linkedin(keywords: list[str] = DEFAULT_KEYWORDS, max_posts: int = 100, debug: bool = False) -> list[dict]:
     email = os.getenv("LINKEDIN_EMAIL")
     password = os.getenv("LINKEDIN_PASSWORD")
     if not email or not password:
