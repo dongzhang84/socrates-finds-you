@@ -1,7 +1,7 @@
 """
 socrates-finds-you — Local Web UI
 Run: python3 app.py
-Visit: http://localhost:5000
+Visit: http://localhost:8080
 """
 
 import sqlite3
@@ -404,5 +404,5 @@ def status():
 
 
 if __name__ == "__main__":
-    print("socrates-finds-you UI → http://localhost:5000")
-    app.run(debug=False, port=5000)
+    print("socrates-finds-you UI → http://localhost:8080")
+    app.run(debug=False, port=8080)

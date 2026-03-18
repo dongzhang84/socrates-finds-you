@@ -18,7 +18,7 @@ Scrapers (9 platforms) → SQLite → Claude API Matcher → Daily Report + Web 
 
 1. **Scrape** — Pull posts and discussions from up to 9 platforms using Playwright, public APIs, and RSS
 2. **Match** — Claude evaluates each signal against the service menu in batches of 10, returning `service_match`, `client_tier`, `confidence`, and a one-line `reasoning`
-3. **Report** — Ranked Markdown report written to `output/report_YYYY-MM-DD.md`, plus a live web dashboard at `localhost:5000`
+3. **Report** — Ranked Markdown report written to `output/report_YYYY-MM-DD.md`, plus a live web dashboard at `localhost:8080`
 
 ---
 
@@ -106,7 +106,7 @@ python3 main.py --reddit-only  # scrape + match + generate report (~2 min)
 **Step 4 — Open the dashboard**
 
 ```bash
-python3 app.py               # → http://localhost:5000
+python3 app.py               # → http://localhost:8080
 ```
 
 That's it. The dashboard shows your matched leads sorted by tier. Hit **Run Pipeline** to trigger a fresh scrape from the browser.

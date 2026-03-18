@@ -11,7 +11,7 @@ All notable changes to this project are documented here.
 ## [1.3.0] — 2026-03-16
 
 ### Added
-- `app.py` — local Flask web dashboard at `http://localhost:5000`
+- `app.py` — local Flask web dashboard at `http://localhost:8080`
   - Leads grouped by tier (High / Medium / Low) with service match, confidence, and reasoning
   - **Run Pipeline** button triggers `python3 main.py --reddit-only` in the background with a live log stream
   - Auto-reloads page when pipeline finishes
