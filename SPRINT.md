@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-03-18 06:10 UTC  
+**Generated:** 2026-03-18 06:41 UTC  
 **Showing:** last 3 week(s) of 3 total  
 
 ---
@@ -11,11 +11,11 @@
 |------|-------|
 | Status | ❌ Stalled |
 | Active days | 2 / 7 |
-| Total commits | 23 |
+| Total commits | 24 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| **17** | **6** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+| **17** | **7** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 
 **Mon – Monday, Mar 16**
 
@@ -39,6 +39,7 @@
 
 **Tue – Tuesday, Mar 17**
 
+- `7b555b1` add linkedin all results — _dongzhang84_ `2026-03-17 23:41`
 - `de280ff` feat: update Blind scraper to use /channels/ pages — _dongzhang84_ `2026-03-17 23:10`
 - `362ada8` feat: increase LinkedIn and Blind scraping limits — _dongzhang84_ `2026-03-17 21:35`
 - `03ac6c9` update docs — _dongzhang84_ `2026-03-17 18:52`
