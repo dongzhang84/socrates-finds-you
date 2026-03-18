@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-03-17 00:25 UTC  
+**Generated:** 2026-03-18 01:05 UTC  
 **Showing:** last 3 week(s) of 3 total  
 
 ---
@@ -10,12 +10,12 @@
 | Stat | Value |
 |------|-------|
 | Status | ❌ Stalled |
-| Active days | 1 / 7 |
-| Total commits | 17 |
+| Active days | 2 / 7 |
+| Total commits | 18 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| **17** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+| **17** | **1** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 
 **Mon – Monday, Mar 16**
 
@@ -36,6 +36,10 @@
 - `bc15160` feat: add Blind scraper — _dongzhang84_ `2026-03-16 11:20`
 - `19616be` update implementation guide — _dongzhang84_ `2026-03-16 01:17`
 - `46e23ce` feat: add LinkedIn scraper — _dongzhang84_ `2026-03-16 01:12`
+
+**Tue – Tuesday, Mar 17**
+
+- `1dfc88e` change local address to 8080 — _dongzhang84_ `2026-03-17 18:05`
 
 ---
 
