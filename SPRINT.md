@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-03-18 01:52 UTC  
+**Generated:** 2026-03-18 04:36 UTC  
 **Showing:** last 3 week(s) of 3 total  
 
 ---
@@ -11,11 +11,11 @@
 |------|-------|
 | Status | ❌ Stalled |
 | Active days | 2 / 7 |
-| Total commits | 21 |
+| Total commits | 22 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| **17** | **4** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+| **17** | **5** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 
 **Mon – Monday, Mar 16**
 
@@ -39,6 +39,7 @@
 
 **Tue – Tuesday, Mar 17**
 
+- `362ada8` feat: increase LinkedIn and Blind scraping limits — _dongzhang84_ `2026-03-17 21:35`
 - `03ac6c9` update docs — _dongzhang84_ `2026-03-17 18:52`
 - `3a0e4dc` fix bug run pipeline only shows reeddit — _dongzhang84_ `2026-03-17 18:49`
 - `8105b09` add suggested reply — _dongzhang84_ `2026-03-17 18:48`
