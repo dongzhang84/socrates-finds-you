@@ -58,6 +58,28 @@ def _get_leads(hours: int = 48) -> list[dict]:
     return [dict(r) for r in rows]
 
 
+def _get_linkedin_signals(limit: int = 100) -> list[dict]:
+    """Return all LinkedIn signals, newest first."""
+    if not Path(DB_PATH).exists():
+        return []
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    try:
+        rows = conn.execute(
+            """
+            SELECT title, url, author, body, matched, service_match, scraped_at
+            FROM signals
+            WHERE platform = 'linkedin'
+            ORDER BY scraped_at DESC
+            LIMIT ?
+            """,
+            (limit,),
+        ).fetchall()
+    finally:
+        conn.close()
+    return [dict(r) for r in rows]
+
+
 def _db_stats() -> dict:
     """Return total / matched / unmatched counts."""
     if not Path(DB_PATH).exists():
@@ -213,6 +235,23 @@ PAGE = """<!DOCTYPE html>
   .copy-btn:hover { background: #f0f0f0; border-color: #aaa; }
   .copy-btn.copied { background: #d1fae5; border-color: #6ee7b7; color: #065f46; }
 
+  /* LinkedIn section */
+  .linkedin-section { margin-top: 48px; }
+  .linkedin-header { display: flex; align-items: center; gap: 10px;
+                     padding: 10px 0; border-bottom: 2px solid #0a66c2; margin-bottom: 14px; }
+  .linkedin-title { font-size: 0.95rem; font-weight: 600; text-transform: uppercase;
+                    letter-spacing: 0.4px; color: #0a66c2; }
+  .li-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 10px;
+             padding: 14px 18px; margin-bottom: 8px; transition: box-shadow 0.15s; }
+  .li-card:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.08); }
+  .li-card-title { font-size: 0.92rem; font-weight: 600; margin-bottom: 5px; }
+  .li-card-title a { color: #111; text-decoration: none; }
+  .li-card-title a:hover { text-decoration: underline; color: #0a66c2; }
+  .li-card-meta { font-size: 0.75rem; color: #888; margin-bottom: 6px; }
+  .li-card-body { font-size: 0.82rem; color: #444; line-height: 1.5; }
+  .badge-matched { background: #f0fdf4; color: #166534; }
+  .badge-unmatched { background: #fafafa; color: #888; }
+
   /* Empty state */
   .empty { text-align: center; padding: 48px 20px; color: #888; font-size: 0.9rem; }
   .empty p { margin-bottom: 8px; }
@@ -308,6 +347,38 @@ PAGE = """<!DOCTYPE html>
   {% endif %}
 
   <div id="log-drawer"></div>
+
+  <!-- LinkedIn all signals -->
+  <div class="linkedin-section">
+    <div class="linkedin-header">
+      <span>📌</span>
+      <span class="linkedin-title">LinkedIn — All Signals</span>
+      <span class="tier-count">{{ linkedin_signals|length }}</span>
+    </div>
+
+    {% if linkedin_signals %}
+      {% for s in linkedin_signals %}
+      <div class="li-card">
+        <div class="li-card-title">
+          <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.title }}</a>
+        </div>
+        <div class="li-card-meta">
+          {% if s.author %}<strong>{{ s.author }}</strong> · {% endif %}
+          {% if s.matched %}
+            <span class="badge badge-matched">matched{% if s.service_match %}: {{ s.service_match }}{% endif %}</span>
+          {% else %}
+            <span class="badge badge-unmatched">unmatched</span>
+          {% endif %}
+        </div>
+        {% if s.body %}
+        <div class="li-card-body">{{ s.body[:200] }}{% if s.body|length > 200 %}…{% endif %}</div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    {% else %}
+      <div style="color:#aaa;font-size:0.85rem;padding:10px 2px;font-style:italic;">No LinkedIn signals in the database yet.</div>
+    {% endif %}
+  </div>
 
 </div>
 
@@ -409,6 +480,7 @@ def index():
         stats=stats,
         total_leads=len(leads),
         last_report=_latest_report_time(),
+        linkedin_signals=_get_linkedin_signals(),
     )
 
 
