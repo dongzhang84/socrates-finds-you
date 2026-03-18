@@ -8,12 +8,27 @@ All notable changes to this project are documented here.
 
 ---
 
+## [1.4.0] — 2026-03-17
+
+### Added
+- `suggested_reply` field — Claude now generates a ready-to-send Reddit reply (2–4 sentences, natural tone, soft CTA) for every matched signal alongside the existing `service_match`, `client_tier`, `confidence`, and `reasoning`
+- `--fix-replies` flag in `main.py` — backfills `suggested_reply` for matched signals that predate the field; safe to re-run (skips signals that already have a reply)
+- `storage/db.py` — `get_matched_without_reply()` and `update_suggested_reply()` helpers; auto-migration adds `suggested_reply TEXT` column to existing databases on first run
+- Dashboard: each lead card now shows the suggested reply in a styled block with a one-click **Copy** button
+
+### Changed
+- **Run Pipeline** button now runs the full pipeline (`python3 main.py`) instead of `--reddit-only`, covering LinkedIn, Blind, HN, RSS, Reddit, and Grad Cafe
+- Default port changed from 5000 → 8080
+- `app.py` calls `init_db()` at startup so schema migrations apply automatically without running `main.py` first
+
+---
+
 ## [1.3.0] — 2026-03-16
 
 ### Added
 - `app.py` — local Flask web dashboard at `http://localhost:8080`
   - Leads grouped by tier (High / Medium / Low) with service match, confidence, and reasoning
-  - **Run Pipeline** button triggers `python3 main.py --reddit-only` in the background with a live log stream
+  - **Run Pipeline** button triggers the full pipeline in the background with a live log stream
   - Auto-reloads page when pipeline finishes
   - Stats bar: total signals in DB, per-tier lead counts, last report timestamp
 

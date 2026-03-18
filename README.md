@@ -17,7 +17,7 @@ Scrapers (9 platforms) → SQLite → Claude API Matcher → Daily Report + Web 
 **Three phases run end-to-end with a single command:**
 
 1. **Scrape** — Pull posts and discussions from up to 9 platforms using Playwright, public APIs, and RSS
-2. **Match** — Claude evaluates each signal against the service menu in batches of 10, returning `service_match`, `client_tier`, `confidence`, and a one-line `reasoning`
+2. **Match** — Claude evaluates each signal against the service menu in batches of 10, returning `service_match`, `client_tier`, `confidence`, `reasoning`, and a `suggested_reply` — a ready-to-send Reddit reply written in a natural, non-salesy tone
 3. **Report** — Ranked Markdown report written to `output/report_YYYY-MM-DD.md`, plus a live web dashboard at `localhost:8080`
 
 ---
@@ -26,7 +26,7 @@ Scrapers (9 platforms) → SQLite → Claude API Matcher → Daily Report + Web 
 
 > _Web dashboard — leads grouped by tier with service match, confidence, and reasoning_
 
-![Dashboard](images/screenshot_1.png)
+![Dashboard](images/screenshot_2.png)
 
 ```
 # socrates-finds-you — Daily Report 2026-03-16
@@ -99,8 +99,8 @@ cp .env.example .env
 **Step 3 — Initialize and run**
 
 ```bash
-python3 storage/db.py        # create the database (one-time)
-python3 main.py --reddit-only  # scrape + match + generate report (~2 min)
+python3 storage/db.py  # create the database (one-time)
+python3 main.py        # scrape + match + generate report (full pipeline)
 ```
 
 **Step 4 — Open the dashboard**
@@ -120,12 +120,12 @@ Once set up, your workflow is:
 ```bash
 # Option A: use the web dashboard (recommended)
 python3 app.py
-# Then click "Run Pipeline" on the page — it streams the log and reloads when done.
+# Then click "Run Pipeline" on the page — runs the full pipeline, streams the log, reloads when done.
 
 # Option B: run from the terminal
-python3 main.py --reddit-only   # free, no browser, ~2 min
-python3 main.py --high-value-only  # LinkedIn + Blind (browser required)
-python3 main.py                    # everything
+python3 main.py                    # full pipeline (LinkedIn, Blind, HN, RSS, Reddit, Grad Cafe)
+python3 main.py --reddit-only      # free, no browser, ~2 min
+python3 main.py --high-value-only  # LinkedIn + Blind only (browser required)
 ```
 
 **All pipeline flags:**
@@ -138,6 +138,7 @@ python3 main.py                    # everything
 | _(none)_ | All active platforms | All credentials |
 | `--no-scrape` | Skip scraping, re-run matching on existing data | `ANTHROPIC_API_KEY` |
 | `--report-only` | Regenerate report from already-matched signals | None |
+| `--fix-replies` | Generate `suggested_reply` for matched signals missing one | `ANTHROPIC_API_KEY` |
 
 Reports are saved to `output/report_YYYY-MM-DD.md`. Each run deduplicates automatically — running twice a day is safe.
 
@@ -199,12 +200,12 @@ These are the only two files you need to edit. Everything else — scraping, sto
 ## Web Dashboard
 
 ```bash
-python3 app.py    # → http://localhost:5000
+python3 app.py    # → http://localhost:8080
 ```
 
 - Matched leads from the last 48 hours, grouped by tier
-- Per-lead: title (clickable link), platform, service match, confidence, reasoning
-- **Run Pipeline** button — streams the live log, auto-reloads when done
+- Per-lead: title (clickable link), platform, service match, confidence, reasoning, and a **suggested reply** with a one-click Copy button
+- **Run Pipeline** button — runs the full pipeline, streams the live log, auto-reloads when done
 - Stats bar: total signals in DB, high / medium / low counts
 
 ---
@@ -296,6 +297,7 @@ CREATE TABLE signals (
     client_tier      TEXT,               -- "high" | "medium" | "low"
     confidence       TEXT,               -- "high" | "medium" | "low"
     reasoning        TEXT,               -- one-sentence explanation
+    suggested_reply  TEXT,               -- ready-to-send Reddit reply (2-4 sentences)
 
     -- Tracking
     included_in_report  BOOLEAN DEFAULT FALSE,
