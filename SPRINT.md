@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-03-19 07:46 UTC  
+**Generated:** 2026-03-19 08:00 UTC  
 **Showing:** last 3 week(s) of 3 total  
 
 ---
@@ -11,11 +11,11 @@
 |------|-------|
 | Status | ⚠️ Slow |
 | Active days | 3 / 7 |
-| Total commits | 26 |
+| Total commits | 27 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| **17** | **8** | ⚪ | **1** | ⚪ | ⚪ | ⚪ |
+| **17** | **8** | ⚪ | **2** | ⚪ | ⚪ | ⚪ |
 
 **Mon – Monday, Mar 16**
 
@@ -50,6 +50,7 @@
 
 **Thu – Thursday, Mar 19**
 
+- `6386cf5` feat: add Mark as Replied button and Hide Replied filter to dashboard — _dongzhang84_ `2026-03-19 01:00`
 - `06b28ad` remove reddit cscareerquestions — _dongzhang84_ `2026-03-19 00:46`
 
 ---
