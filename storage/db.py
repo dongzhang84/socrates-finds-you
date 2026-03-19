@@ -49,6 +49,21 @@ def init_db() -> None:
             pass  # Column already exists
         conn.commit()
 
+    # Remove signals from retired subreddits
+    delete_signals_by_subreddit("cscareerquestions")
+
+
+def delete_signals_by_subreddit(subreddit: str) -> int:
+    with _connect() as conn:
+        cursor = conn.execute(
+            "DELETE FROM signals WHERE subreddit = ?",
+            (subreddit,),
+        )
+        conn.commit()
+    if cursor.rowcount:
+        logger.info("[db] Deleted %d signals from r/%s", cursor.rowcount, subreddit)
+    return cursor.rowcount
+
 
 def save_signals(signals: list[dict]) -> int:
     if not signals:

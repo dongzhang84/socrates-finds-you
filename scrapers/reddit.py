@@ -10,7 +10,7 @@ HEADERS = {"User-Agent": "socrates-finds-you/1.0"}
 CUTOFF_HOURS = 48
 
 TIER_HIGH = ["PhD", "AskAcademia", "datascience", "MachineLearning"]
-TIER_MEDIUM = ["cscareerquestions", "learnmachinelearning", "GradSchool"]
+TIER_MEDIUM = ["learnmachinelearning", "GradSchool"]
 TIER_LOW = ["SAT", "ApplyingToCollege", "learnpython"]
 DEFAULT_SUBREDDITS = TIER_HIGH + TIER_MEDIUM + TIER_LOW
 
