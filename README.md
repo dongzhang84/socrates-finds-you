@@ -2,7 +2,7 @@
 
 ![Cover](images/cover.png)
 
-> An automated pipeline that finds people who need STEM, AI, and career mentorship — before they find you.
+An automated pipeline that finds people who need STEM, AI, and career mentorship — before they find you.
 
 Scrapes LinkedIn, Blind, Reddit, Hacker News, RSS feeds, and The Grad Cafe for coaching signals, uses **Claude AI** to match each post against a service menu, and delivers a ranked daily Markdown report with a local web dashboard.
 
