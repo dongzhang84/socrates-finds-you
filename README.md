@@ -204,6 +204,7 @@ python3 app.py    # → http://localhost:8080
 ```
 
 - Matched leads from the last 48 hours, grouped by tier
+- **Date selector** — dropdown lists every date with matched signals; defaults to today; selecting a date reloads the page showing only leads from that day
 - Per-lead: title (clickable link), platform, service match, confidence, reasoning, a **suggested reply** with a one-click Copy button, and a **Mark as Replied** button that turns green ("✅ Replied") when clicked — toggleable, persists across reloads
 - **Show All / Hide Replied** filter toggle — default Show All; Hide Replied hides actioned cards without a page reload
 - **Run Pipeline** button — runs the full pipeline, streams the live log, auto-reloads when done

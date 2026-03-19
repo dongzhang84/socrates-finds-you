@@ -35,11 +35,24 @@ _state_lock = threading.Lock()
 # DB helpers
 # ---------------------------------------------------------------------------
 
-def _get_leads(hours: int = 48) -> list[dict]:
-    """Return matched signals scraped within the last `hours` hours, newest first."""
+def _get_matched_dates() -> list[str]:
+    """Return distinct dates (YYYY-MM-DD) that have matched signals, newest first."""
     if not Path(DB_PATH).exists():
         return []
-    cutoff = (datetime.now(timezone.utc) - timedelta(hours=hours)).isoformat()
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        rows = conn.execute(
+            "SELECT DISTINCT DATE(scraped_at) FROM signals WHERE matched = TRUE ORDER BY scraped_at DESC"
+        ).fetchall()
+    finally:
+        conn.close()
+    return [r[0] for r in rows if r[0]]
+
+
+def _get_leads(date: str) -> list[dict]:
+    """Return matched signals scraped on the given date (YYYY-MM-DD), newest first."""
+    if not Path(DB_PATH).exists():
+        return []
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     try:
@@ -49,10 +62,10 @@ def _get_leads(hours: int = 48) -> list[dict]:
                    client_tier, confidence, reasoning, suggested_reply, posted_at, scraped_at,
                    actioned
             FROM signals
-            WHERE matched = TRUE AND scraped_at >= ?
+            WHERE matched = TRUE AND DATE(scraped_at) = ?
             ORDER BY scraped_at DESC
             """,
-            (cutoff,),
+            (date,),
         ).fetchall()
     finally:
         conn.close()
@@ -270,6 +283,12 @@ PAGE = """<!DOCTYPE html>
   .replied-btn:hover { background: #f0f0f0; border-color: #aaa; }
   .replied-btn.done { background: #d1fae5; border-color: #6ee7b7; color: #065f46; cursor: pointer; }
 
+  /* Date selector */
+  .date-select { padding: 5px 10px; font-size: 0.82rem; border: 1px solid #d1d5db;
+                 border-radius: 6px; background: #fff; color: #1a1a1a; cursor: pointer;
+                 outline: none; }
+  .date-select:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.15); }
+
   /* Filter toggle */
   .filter-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
   .filter-bar label { font-size: 0.82rem; color: #555; font-weight: 500; }
@@ -323,6 +342,16 @@ PAGE = """<!DOCTYPE html>
 <div class="main">
 
   <div class="filter-bar">
+    <label>Date:</label>
+    <select class="date-select" onchange="location.href='/?date='+this.value">
+      {% for opt in date_options %}
+      <option value="{{ opt.value }}" {% if opt.value == selected_date %}selected{% endif %}>{{ opt.label }}</option>
+      {% endfor %}
+      {% if not date_options %}
+      <option value="{{ selected_date }}">Today ({{ selected_date }})</option>
+      {% endif %}
+    </select>
+    <div style="width:16px"></div>
     <label>Show:</label>
     <div class="toggle-wrap">
       <button class="toggle-btn active" id="btn-all" onclick="setFilter('all')">Show All</button>
@@ -538,7 +567,25 @@ function pollStatus() {
 
 @app.route("/")
 def index():
-    leads = _get_leads(hours=48)
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    yesterday = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%d")
+
+    matched_dates = _get_matched_dates()
+    selected_date = request.args.get("date", "")
+    if selected_date not in matched_dates:
+        # Default to today if present, else most recent available date
+        selected_date = today if today in matched_dates else (matched_dates[0] if matched_dates else today)
+
+    def _label(d: str) -> str:
+        if d == today:
+            return f"Today ({d})"
+        if d == yesterday:
+            return f"Yesterday ({d})"
+        return d
+
+    date_options = [{"value": d, "label": _label(d)} for d in matched_dates]
+
+    leads = _get_leads(selected_date)
 
     tier_order = {"high": 0, "medium": 1, "low": 2}
     leads.sort(key=lambda s: tier_order.get((s.get("client_tier") or "low").lower(), 99))
@@ -559,6 +606,8 @@ def index():
         total_leads=len(leads),
         last_report=_latest_report_time(),
         linkedin_signals=_get_linkedin_signals(),
+        date_options=date_options,
+        selected_date=selected_date,
     )
 
 

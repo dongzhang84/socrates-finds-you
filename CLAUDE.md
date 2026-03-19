@@ -64,7 +64,8 @@ Model: `claude-sonnet-4-5`. Batch size: 10. Max tokens: 4096.
 ## Web Dashboard (`app.py`)
 
 - Calls `init_db()` at startup — safe to run without running `main.py` first
-- Main section: matched leads from last 48 hours, grouped by tier, with suggested reply + Copy button
+- **Date selector** dropdown — populated from `SELECT DISTINCT DATE(scraped_at) … WHERE matched=TRUE`; defaults to today; drives `?date=YYYY-MM-DD` URL param. `_get_leads(date)` filters by calendar date, not a rolling window.
+- Main section: matched leads for the selected date, grouped by tier, with suggested reply + Copy button
 - **Mark as Replied** button on each lead card — POSTs to `POST /api/mark-replied` with `{ id, actioned: bool }`; toggles `actioned` in the DB; button turns green ("✅ Replied") when active, reverts on undo
 - **Show All / Hide Replied** filter toggle (default: Show All) — hides/shows `actioned` cards client-side without reload
 - Bottom section: **LinkedIn — All Signals** — every LinkedIn signal regardless of match status

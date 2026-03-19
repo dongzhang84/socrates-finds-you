@@ -8,6 +8,18 @@ All notable changes to this project are documented here.
 
 ---
 
+## [1.7.0] — 2026-03-19
+
+### Added
+- Dashboard: **date selector dropdown** in the filter bar — lists all dates that have matched signals (`SELECT DISTINCT DATE(scraped_at) … WHERE matched=TRUE`), formatted as "Today (YYYY-MM-DD)", "Yesterday (YYYY-MM-DD)", or bare date. Selecting a date reloads the page with `?date=YYYY-MM-DD`.
+- Default date is today if signals exist for today, otherwise the most recent available date.
+- `_get_matched_dates()` DB helper in `app.py`.
+
+### Changed
+- `_get_leads()` now filters by a specific calendar date (`DATE(scraped_at) = ?`) instead of a rolling 48-hour window.
+
+---
+
 ## [1.6.0] — 2026-03-19
 
 ### Added
