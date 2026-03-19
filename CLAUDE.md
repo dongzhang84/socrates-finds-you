@@ -17,7 +17,7 @@ Scrapers → SQLite (data/signals.db) → Claude Matcher → Report + Web Dashbo
 **Key modules:**
 - `scrapers/` — one file per platform (LinkedIn, Blind, Reddit, HN, RSS, Grad Cafe, 小红书)
 - `matcher/claude_match.py` — Claude API batched matching + reply generation
-- `storage/db.py` — all SQLite access; `init_db()` handles schema + auto-migrations
+- `storage/db.py` — all SQLite access; `init_db()` handles schema + auto-migrations + purges retired subreddits
 - `reporter/daily_report.py` — Markdown report generator
 
 ## Database
@@ -65,6 +65,8 @@ Model: `claude-sonnet-4-5`. Batch size: 10. Max tokens: 4096.
 
 - Calls `init_db()` at startup — safe to run without running `main.py` first
 - Main section: matched leads from last 48 hours, grouped by tier, with suggested reply + Copy button
+- **Mark as Replied** button on each lead card — POSTs to `POST /api/mark-replied` with `{ id, actioned: bool }`; toggles `actioned` in the DB; button turns green ("✅ Replied") when active, reverts on undo
+- **Show All / Hide Replied** filter toggle (default: Show All) — hides/shows `actioned` cards client-side without reload
 - Bottom section: **LinkedIn — All Signals** — every LinkedIn signal regardless of match status
 
 ## Conventions

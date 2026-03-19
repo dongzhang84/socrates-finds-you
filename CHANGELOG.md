@@ -8,6 +8,21 @@ All notable changes to this project are documented here.
 
 ---
 
+## [1.6.0] — 2026-03-19
+
+### Added
+- Dashboard: **"Mark as Replied" / "✅ Replied" toggle button** on each lead card — click to mark a lead as replied (stored as `actioned=TRUE` in the DB); click again to undo. Button turns green when active, reverts to gray/white on undo. State persists across page reloads.
+- Dashboard: **"Show All / Hide Replied" filter toggle** at the top of the leads section — defaults to Show All. When Hide Replied is active, cards with `actioned=TRUE` are hidden. Switching back to Show All reveals them without a page reload.
+- `POST /api/mark-replied` endpoint — accepts `{ id, actioned: true|false }` JSON; sets or clears `actioned` on the signal record.
+- `storage/db.py` — `mark_actioned(id)` helper.
+
+### Changed
+- Removed `r/cscareerquestions` from the Reddit subreddits list (`scrapers/reddit.py` `TIER_MEDIUM`).
+- `storage/db.py` — `init_db()` now calls `delete_signals_by_subreddit("cscareerquestions")` on every startup to purge any existing signals from that subreddit.
+- `storage/db.py` — added `delete_signals_by_subreddit(subreddit)` helper.
+
+---
+
 ## [1.5.0] — 2026-03-17
 
 ### Added

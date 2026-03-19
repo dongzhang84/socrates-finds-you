@@ -11,8 +11,8 @@ import time
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
-from flask import Flask, jsonify, render_template_string
-from storage.db import init_db
+from flask import Flask, jsonify, render_template_string, request
+from storage.db import init_db, mark_actioned
 
 app = Flask(__name__)
 init_db()  # ensures schema + migrations run on every startup
@@ -46,7 +46,8 @@ def _get_leads(hours: int = 48) -> list[dict]:
         rows = conn.execute(
             """
             SELECT id, platform, subreddit, title, url, service_match,
-                   client_tier, confidence, reasoning, suggested_reply, posted_at, scraped_at
+                   client_tier, confidence, reasoning, suggested_reply, posted_at, scraped_at,
+                   actioned
             FROM signals
             WHERE matched = TRUE AND scraped_at >= ?
             ORDER BY scraped_at DESC
@@ -93,6 +94,16 @@ def _db_stats() -> dict:
     finally:
         conn.close()
     return {"total": total, "matched": matched, "unmatched": total - matched}
+
+
+def _unmark_actioned(id: str) -> None:
+    import sqlite3 as _sqlite3
+    conn = _sqlite3.connect(DB_PATH)
+    try:
+        conn.execute("UPDATE signals SET actioned = FALSE WHERE id = ?", (id,))
+        conn.commit()
+    finally:
+        conn.close()
 
 
 def _latest_report_time() -> str | None:
@@ -252,6 +263,25 @@ PAGE = """<!DOCTYPE html>
   .badge-matched { background: #f0fdf4; color: #166534; }
   .badge-unmatched { background: #fafafa; color: #888; }
 
+  /* Replied button */
+  .replied-btn { margin-top: 6px; padding: 3px 10px; font-size: 0.75rem; font-weight: 500;
+                 background: #fff; border: 1px solid #d1d5db; border-radius: 5px;
+                 cursor: pointer; color: #555; transition: all 0.15s; }
+  .replied-btn:hover { background: #f0f0f0; border-color: #aaa; }
+  .replied-btn.done { background: #d1fae5; border-color: #6ee7b7; color: #065f46; cursor: pointer; }
+
+  /* Filter toggle */
+  .filter-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+  .filter-bar label { font-size: 0.82rem; color: #555; font-weight: 500; }
+  .toggle-wrap { display: flex; background: #f0f0f0; border-radius: 6px; padding: 2px; }
+  .toggle-btn { padding: 4px 14px; border: none; border-radius: 5px; font-size: 0.78rem;
+                font-weight: 500; cursor: pointer; background: transparent; color: #666;
+                transition: all 0.15s; }
+  .toggle-btn.active { background: #fff; color: #1a1a1a; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+  /* Hidden-replied state */
+  .lead.replied-hidden { display: none; }
+
   /* Empty state */
   .empty { text-align: center; padding: 48px 20px; color: #888; font-size: 0.9rem; }
   .empty p { margin-bottom: 8px; }
@@ -292,6 +322,14 @@ PAGE = """<!DOCTYPE html>
 
 <div class="main">
 
+  <div class="filter-bar">
+    <label>Show:</label>
+    <div class="toggle-wrap">
+      <button class="toggle-btn active" id="btn-all" onclick="setFilter('all')">Show All</button>
+      <button class="toggle-btn" id="btn-hide" onclick="setFilter('hide')">Hide Replied</button>
+    </div>
+  </div>
+
   {% for tier, emoji, label, cls in [
       ("high",   "🔴", "High Value — PhD / Professionals",   "high"),
       ("medium", "🟡", "Medium Value — College / Early Career", "medium"),
@@ -306,7 +344,7 @@ PAGE = """<!DOCTYPE html>
 
     {% if leads_by_tier[tier] %}
       {% for lead in leads_by_tier[tier] %}
-      <div class="lead">
+      <div class="lead{% if lead.actioned %} lead-actioned{% endif %}" data-id="{{ lead.id }}">
         <div class="lead-title">
           <a href="{{ lead.url }}" target="_blank" rel="noopener">{{ lead.title }}</a>
         </div>
@@ -329,6 +367,10 @@ PAGE = """<!DOCTYPE html>
           <div class="reply-label">Suggested reply</div>
           <div class="reply-text" id="reply-{{ loop.index0 }}-{{ tier }}">{{ lead.suggested_reply }}</div>
           <button class="copy-btn" onclick="copyReply('reply-{{ loop.index0 }}-{{ tier }}', this)">Copy</button>
+          <button class="replied-btn{% if lead.actioned %} done{% endif %}"
+                  onclick="markReplied(this)">
+            {% if lead.actioned %}✅ Replied{% else %}Mark as Replied{% endif %}
+          </button>
         </div>
         {% endif %}
       </div>
@@ -384,6 +426,42 @@ PAGE = """<!DOCTYPE html>
 
 <script>
 let pollTimer = null;
+let currentFilter = 'all';
+
+function setFilter(mode) {
+  currentFilter = mode;
+  document.getElementById('btn-all').classList.toggle('active', mode === 'all');
+  document.getElementById('btn-hide').classList.toggle('active', mode === 'hide');
+  document.querySelectorAll('.lead.lead-actioned').forEach(el => {
+    el.classList.toggle('replied-hidden', mode === 'hide');
+  });
+}
+
+// Apply default filter on load
+document.addEventListener('DOMContentLoaded', () => setFilter('all'));
+
+function markReplied(btn) {
+  const card = btn.closest('.lead');
+  const id = card.dataset.id;
+  const isActioned = card.classList.contains('lead-actioned');
+  fetch('/api/mark-replied', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id, actioned: !isActioned }),
+  }).then(r => r.json()).then(data => {
+    if (data.ok) {
+      if (!isActioned) {
+        card.classList.add('lead-actioned');
+        btn.textContent = '✅ Replied';
+        btn.classList.add('done');
+      } else {
+        card.classList.remove('lead-actioned', 'replied-hidden');
+        btn.textContent = 'Mark as Replied';
+        btn.classList.remove('done');
+      }
+    }
+  });
+}
 
 function runPipeline() {
   const btn = document.getElementById('run-btn');
@@ -491,6 +569,20 @@ def run():
             return jsonify({"error": "Pipeline already running"}), 409
     thread = threading.Thread(target=_run_pipeline, daemon=True)
     thread.start()
+    return jsonify({"ok": True})
+
+
+@app.route("/api/mark-replied", methods=["POST"])
+def api_mark_replied():
+    data = request.get_json(force=True)
+    signal_id = data.get("id", "").strip()
+    actioned = data.get("actioned", True)
+    if not signal_id:
+        return jsonify({"error": "missing id"}), 400
+    if actioned:
+        mark_actioned(signal_id)
+    else:
+        _unmark_actioned(signal_id)
     return jsonify({"ok": True})
 
 

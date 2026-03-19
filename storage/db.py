@@ -151,6 +151,12 @@ def get_matched_without_reply(limit: int = 500) -> list[dict]:
     return [dict(r) for r in rows]
 
 
+def mark_actioned(id: str) -> None:
+    with _connect() as conn:
+        conn.execute("UPDATE signals SET actioned = TRUE WHERE id = ?", (id,))
+        conn.commit()
+
+
 def update_suggested_reply(id: str, suggested_reply: str) -> None:
     with _connect() as conn:
         conn.execute(

@@ -58,7 +58,7 @@ Scrapers (9 platforms) → SQLite → Claude API Matcher → Daily Report + Web 
 | ⭐ | 小红书 | Mid — Chinese-speaking diaspora | Playwright | 🔧 Stub |
 | — | Twitter/X | High | tweepy | ⛔ Disabled (API cost) |
 
-**Reddit subreddits monitored:** r/PhD, r/AskAcademia, r/datascience, r/MachineLearning, r/cscareerquestions, r/learnmachinelearning, r/GradSchool, r/SAT, r/ApplyingToCollege, r/learnpython
+**Reddit subreddits monitored:** r/PhD, r/AskAcademia, r/datascience, r/MachineLearning, r/learnmachinelearning, r/GradSchool, r/SAT, r/ApplyingToCollege, r/learnpython
 
 ---
 
@@ -204,7 +204,8 @@ python3 app.py    # → http://localhost:8080
 ```
 
 - Matched leads from the last 48 hours, grouped by tier
-- Per-lead: title (clickable link), platform, service match, confidence, reasoning, and a **suggested reply** with a one-click Copy button
+- Per-lead: title (clickable link), platform, service match, confidence, reasoning, a **suggested reply** with a one-click Copy button, and a **Mark as Replied** button that turns green ("✅ Replied") when clicked — toggleable, persists across reloads
+- **Show All / Hide Replied** filter toggle — default Show All; Hide Replied hides actioned cards without a page reload
 - **Run Pipeline** button — runs the full pipeline, streams the live log, auto-reloads when done
 - Stats bar: total signals in DB, high / medium / low counts
 - **LinkedIn — All Signals** section — shows every LinkedIn signal (matched or not) with title, author, body snippet, and matched status
