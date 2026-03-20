@@ -49,6 +49,13 @@ Key columns: `id` (platform:external_id), `matched`, `service_match`, `client_ti
 
 Model: `claude-sonnet-4-5`. Batch size: 10. Max tokens: 4096.
 
+**Scoring criteria (conversion likelihood, not service category):**
+- HIGH (`matched=True`, `client_tier="high"`) — explicit ask with clear action intent (PhD→industry, AI career, tutor request)
+- MEDIUM (`matched=True`, `client_tier="medium"`) — interested but hesitant or direction unclear
+- NO (`matched=False`) — venting, complaints, unrelated, sharing news with no ask for help
+
+The prompt instructs Claude to be strict: false negatives are preferred over false positives.
+
 ## main.py flags
 
 | Flag | What it does |
@@ -66,9 +73,28 @@ Model: `claude-sonnet-4-5`. Batch size: 10. Max tokens: 4096.
 - Calls `init_db()` at startup — safe to run without running `main.py` first
 - **Date selector** dropdown — populated from `SELECT DISTINCT DATE(scraped_at) … WHERE matched=TRUE`; defaults to today; drives `?date=YYYY-MM-DD` URL param. `_get_leads(date)` filters by calendar date, not a rolling window.
 - Main section: matched leads for the selected date, grouped by tier, with suggested reply + Copy button
+- **Lead sort order within each tier**: AI Career Path Planning → AI Upskilling for Professionals → Applied AI Project Coaching → PhD to Industry Transition → AI/ML Learning Path → AP/SAT/ACT Math → College-Level STEM → everything else. Defined by `service_priority` dict in `index()`.
 - **Mark as Replied** button on each lead card — POSTs to `POST /api/mark-replied` with `{ id, actioned: bool }`; toggles `actioned` in the DB; button turns green ("✅ Replied") when active, reverts on undo
 - **Show All / Hide Replied** filter toggle (default: Show All) — hides/shows `actioned` cards client-side without reload
 - Bottom section: **LinkedIn — All Signals** — every LinkedIn signal regardless of match status
+
+## Reporter (`reporter/daily_report.py`)
+
+- Generates both `output/report_YYYY-MM-DD.md` (Markdown) and `output/report_YYYY-MM-DD.html` (standalone HTML) on every run
+- All dates and timestamps use **Seattle time** (`ZoneInfo("America/Los_Angeles")`)
+- HTML report includes the same tier/service sort order as the dashboard, Copy button (JS clipboard), and Mark as Replied button (JS visual toggle, resets on refresh) — no Flask dependency
+- `_group_by_tier(signals)` applies the `SERVICE_PRIORITY` sort within each tier (same priorities as `app.py`)
+
+## GitHub Pages (`push_report.sh`)
+
+Publishes the daily HTML report to GitHub Pages:
+```bash
+./push_report.sh                  # today's report (Seattle time)
+./push_report.sh 2026-03-19      # specific date
+```
+- If `output/report_${TODAY}.html` already exists, skips regeneration
+- Checks out `gh-pages`, copies HTML to `index.html`, commits, pushes, returns to `main`
+- Live at: https://dongzhang84.github.io/socrates-finds-you
 
 ## Conventions
 

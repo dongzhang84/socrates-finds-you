@@ -8,6 +8,21 @@ All notable changes to this project are documented here.
 
 ---
 
+## [2.0.0] — 2026-03-20
+
+### Added
+- `push_report.sh` — one-command script to publish the daily HTML report to GitHub Pages (`gh-pages` branch → `index.html`). Accepts an optional date argument (`./push_report.sh 2026-03-19`); skips Python report generation if the HTML file already exists. Live at: https://dongzhang84.github.io/socrates-finds-you
+- `reporter/daily_report.py` — now generates a standalone **HTML report** (`output/report_YYYY-MM-DD.html`) alongside the existing Markdown. Includes all leads grouped by tier, with title, platform, service match, confidence, reasoning, suggested reply, clickable URL, **Copy** button (pure JS clipboard), and **Mark as Replied** button (pure JS, visual toggle, resets on refresh). No Flask dependency.
+- HTML report: **Copy button** on each lead card — copies suggested reply to clipboard; flashes "Copied!" for 2 s then resets.
+- HTML report: **Mark as Replied button** on each lead card — turns green ("✅ Replied") on click; visual only, no persistence.
+
+### Changed
+- **Claude matching prompt** (`matcher/claude_match.py`) completely rewritten to score leads by **conversion likelihood**, not service category. New criteria: HIGH (explicit ask, clear action intent), MEDIUM (interested but hesitant), NO (venting/complaints/unrelated — `matched=false`). System prompt now says "be strict — false negative is better than false positive."
+- **Lead sort order within each tier** (`app.py` and `reporter/daily_report.py`) — leads now sorted by `service_match` priority: AI Career Path Planning → AI Upskilling for Professionals → Applied AI Project Coaching for Career Switchers → PhD to Industry Transition Coaching → AI / ML Learning Path Coaching → AP / SAT / ACT Math Tutoring → College-Level STEM Tutoring → everything else.
+- All dates and timestamps in `reporter/daily_report.py` now use **Seattle time** (`ZoneInfo("America/Los_Angeles")`) instead of UTC. Report filenames, footer timestamps, and `push_report.sh` all consistent on Seattle time.
+
+---
+
 ## [1.7.0] — 2026-03-19
 
 ### Added

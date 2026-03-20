@@ -687,6 +687,17 @@ Log: [matcher] Batch {N}: {M}/{K} matched
 Log: [matcher] Total: {matched}/{total} matched
 ```
 
+**2026-03-20 Prompt Rewrite — Conversion Likelihood Scoring**
+
+The matching prompt was rewritten to score leads by **conversion likelihood** rather than service category match. Key change: Claude now decides `matched=false` for pure venting, complaints, or unrelated posts — not just "no relevant service."
+
+New scoring tiers:
+- **HIGH** (`matched=true`, `client_tier="high"`) — explicit ask with clear action intent: "how do I transition from PhD to industry", "I want to learn AI/ML, where do I start", parent looking for tutor
+- **MEDIUM** (`matched=true`, `client_tier="medium"`) — interested but hesitant or direction unclear
+- **NO** (`matched=false`) — venting ("PhD is so hard"), complaint with no ask, unrelated, sharing news
+
+The system prompt ends with: *"Be strict: when in doubt, set matched=false. A false negative is better than a false positive that wastes outreach effort."*
+
 **实际实现说明**
 
 **问题 1：Claude 可能重排返回数组**
@@ -787,6 +798,45 @@ Log: [reporter] Saved: output/report_{date}.md ({N} leads)
 - **零信号情况**：`get_report_candidates()` 返回空列表时仍正常生成报告，内容为 `*No leads today. Run again tomorrow.*`，文件依然写入 `output/report_YYYY-MM-DD.md`。
 - **排序**：`TIER_ORDER = {"high": 0, "medium": 1, "low": 2}` 在 Python 层 sort，不依赖 SQL ORDER BY（SQL 按字母排会导致 high/low/medium 错序）。
 - **`generate_report()` 返回值**：返回 `str`（路径），`main.py` 用于最终日志打印。
+
+**2026-03-20 Extensions:**
+
+- `generate_report()` now writes **both** `output/report_YYYY-MM-DD.md` and `output/report_YYYY-MM-DD.html`.
+- All timestamps use **Seattle time** (`ZoneInfo("America/Los_Angeles")`), not UTC. Variable renamed `now_utc` → `now`.
+- `_group_by_tier(signals)` applies `SERVICE_PRIORITY` sort within each tier (same priority map as `app.py`): AI Career Path Planning (0) → AI Upskilling (1) → Applied AI Project (2) → PhD Transition (3) → AI/ML Learning (4) → AP/SAT (5) → STEM Tutoring (6) → everything else (99).
+- HTML report is fully standalone — no Flask, no external CSS. Inline `<style>`, pure JS Copy button (`navigator.clipboard.writeText`), pure JS Mark as Replied toggle (visual only, resets on refresh). Each reply div gets a unique `id="reply-{tier}-{idx}"` for the clipboard JS to target.
+- **Regenerating a past date's HTML**: `get_report_candidates()` only returns signals with `included_in_report=FALSE`, so re-running the reporter won't pick up past dates. Query the DB directly by date and call `_build_html()`:
+  ```python
+  rows = conn.execute("SELECT * FROM signals WHERE matched=TRUE AND DATE(scraped_at)=?", ("2026-03-19",)).fetchall()
+  html = _build_html([dict(r) for r in rows], "2026-03-19", datetime.now(ZoneInfo("America/Los_Angeles")))
+  Path("output/report_2026-03-19.html").write_text(html)
+  ```
+
+---
+
+### Phase 13: GitHub Pages Publishing (`push_report.sh`)
+
+**Goal**: One-command publish of the daily HTML report to a public GitHub Pages URL.
+
+**Script behavior**:
+1. Determines date: optional `$1` arg, or `TZ="America/Los_Angeles" date +%Y-%m-%d`
+2. If `output/report_${TODAY}.html` exists → skip generation
+3. Else → `python3 reporter/daily_report.py`
+4. `git checkout -b gh-pages 2>/dev/null || git checkout gh-pages`
+5. `cp output/report_${TODAY}.html index.html`
+6. `git add index.html && git commit -m "report: ${TODAY}"`
+7. `git push origin gh-pages`
+8. `git checkout main`
+
+**Usage**:
+```bash
+./push_report.sh                    # today
+./push_report.sh 2026-03-19        # specific date
+```
+
+Live URL: https://dongzhang84.github.io/socrates-finds-you
+
+**Note**: `gh-pages` branch only needs `index.html` at the root. GitHub Pages serves it automatically once the branch exists and Pages is enabled in repo Settings.
 
 ---
 
@@ -955,3 +1005,4 @@ python main.py --report-only      # 只重新生成报告
 | 2026-03 | 3.0 | Phase 顺序改为按客群价值排序（对照 02-platforms.md）；新增 Twitter/X、小红书、The Grad Cafe scraper；main.py 新增 --high-value-only 和 --no-browser flag |
 | 2026-03 | 3.1 | Phase 2 实装修正：(1) 登录流程适配 Google SSO 保持登录场景；(2) 新增 "Sign in with email" 按钮点击（LinkedIn 主页改版）；(3) 搜索页等待从 networkidle 改为 domcontentloaded；(4) 所有 selector 改为 JS DOM traversal（LinkedIn 迁移 SDUI，class 名全混淆）；(5) 新增 debug=True / --debug 模式 |
 | 2026-03 | 3.2 | 全部模块实装修正：Phase 3 (Blind) domcontentloaded + CUTOFF_HOURS=168 + 实测 selector；Phase 4 (Twitter) 标记为已禁用；Phase 5 (HN) 确认与 spec 一致；Phase 6 (RSS) macOS SSL 修复（requests+bytes）；Phase 7 (小红书) 标记为未实现；Phase 8 (Reddit) 从 PRAW 改为公开 JSON API；Phase 9 (Grad Cafe) Forum 18 失效改用 72+21，实测 DOM selector；Phase 10 (matcher) 按 id 合并结果 + fence stripping；Phase 11 (reporter) 零信号情况处理；Phase 12 (main.py) Twitter 禁用 + id 拼接位置 + 全程进度日志；常见坑表新增 9 条实测 bug |
+| 2026-03-20 | 4.0 | Phase 10 matcher prompt rewritten for conversion likelihood scoring (HIGH/MEDIUM/NO). Phase 11 reporter now generates HTML + Markdown, Seattle timezone, Copy + Mark as Replied buttons in HTML. Phase 13 added: push_report.sh → GitHub Pages. Lead sort order within tiers by service priority added to both app.py and reporter. |

@@ -587,13 +587,23 @@ def index():
 
     leads = _get_leads(selected_date)
 
-    tier_order = {"high": 0, "medium": 1, "low": 2}
-    leads.sort(key=lambda s: tier_order.get((s.get("client_tier") or "low").lower(), 99))
+    service_priority = {
+        "AI Career Path Planning": 0,
+        "AI Upskilling for Professionals": 1,
+        "Applied AI Project Coaching for Career Switchers": 2,
+        "PhD to Industry Transition Coaching": 3,
+        "AI / ML Learning Path Coaching": 4,
+        "AP / SAT / ACT Math Tutoring": 5,
+        "College-Level STEM Tutoring": 6,
+    }
 
     leads_by_tier: dict[str, list] = {"high": [], "medium": [], "low": []}
     for lead in leads:
         tier = (lead.get("client_tier") or "low").lower()
         leads_by_tier.setdefault(tier, []).append(lead)
+
+    for tier_leads in leads_by_tier.values():
+        tier_leads.sort(key=lambda s: service_priority.get(s.get("service_match") or "", 99))
 
     counts = {t: len(v) for t, v in leads_by_tier.items()}
     stats = _db_stats()

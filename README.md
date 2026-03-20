@@ -20,7 +20,7 @@ Scrapers (9 platforms) → SQLite → Claude API Matcher → Daily Report + Web 
 
 1. **Scrape** — Pull posts and discussions from up to 9 platforms using Playwright, public APIs, and RSS
 2. **Match** — Claude evaluates each signal against the service menu in batches of 10, returning `service_match`, `client_tier`, `confidence`, `reasoning`, and a `suggested_reply` — a ready-to-send Reddit reply written in a natural, non-salesy tone
-3. **Report** — Ranked Markdown report written to `output/report_YYYY-MM-DD.md`, plus a live web dashboard at `localhost:8080`
+3. **Report** — Ranked Markdown report written to `output/report_YYYY-MM-DD.md` and a standalone HTML report at `output/report_YYYY-MM-DD.html`, plus a live web dashboard at `localhost:8080`
 
 ---
 
@@ -142,7 +142,16 @@ python3 main.py --high-value-only  # LinkedIn + Blind only (browser required)
 | `--report-only` | Regenerate report from already-matched signals | None |
 | `--fix-replies` | Generate `suggested_reply` for matched signals missing one | `ANTHROPIC_API_KEY` |
 
-Reports are saved to `output/report_YYYY-MM-DD.md`. Each run deduplicates automatically — running twice a day is safe.
+Reports are saved to `output/report_YYYY-MM-DD.md` and `output/report_YYYY-MM-DD.html`. Each run deduplicates automatically — running twice a day is safe.
+
+**Publishing the HTML report to GitHub Pages:**
+
+```bash
+./push_report.sh                    # publish today's report
+./push_report.sh 2026-03-19        # publish a specific date's report
+```
+
+The script generates the HTML if it doesn't already exist, commits it as `index.html` to the `gh-pages` branch, and pushes. Live at: https://dongzhang84.github.io/socrates-finds-you
 
 ---
 
@@ -171,7 +180,7 @@ LOWER VALUE ([your lower-value client type]):
 """
 ```
 
-Claude will then match every scraped post against your services and return `service_match`, `client_tier`, `confidence`, and a one-line `reasoning`.
+The matching prompt scores leads by **conversion likelihood** — posts where someone is actively seeking help (HIGH: explicit ask with action intent; MEDIUM: interested but hesitant; filtered out: venting, complaints, unrelated posts). Claude returns `matched`, `service_match`, `client_tier`, `confidence`, `reasoning`, and a `suggested_reply`.
 
 ### 2. Change where it looks — `main.py`
 
@@ -207,7 +216,8 @@ python3 app.py    # → http://localhost:8080
 
 - Matched leads from the last 48 hours, grouped by tier
 - **Date selector** — dropdown lists every date with matched signals; defaults to today; selecting a date reloads the page showing only leads from that day
-- Per-lead: title (clickable link), platform, service match, confidence, reasoning, a **suggested reply** with a one-click Copy button, and a **Mark as Replied** button that turns green ("✅ Replied") when clicked — toggleable, persists across reloads
+- Per-lead: title (clickable link), platform, service match, confidence, reasoning, a **suggested reply** with a one-click Copy button, and a **Mark as Replied** button that turns green ("✅ Replied") when clicked — toggleable, persists across reloads (dashboard) or resets on refresh (static HTML report)
+- Leads within each tier sorted by service priority: AI Career Path Planning first, then AI Upskilling, Applied AI Project, PhD Transition, AI/ML Learning, AP/SAT Math, STEM Tutoring, then everything else
 - **Show All / Hide Replied** filter toggle — default Show All; Hide Replied hides actioned cards without a page reload
 - **Run Pipeline** button — runs the full pipeline, streams the live log, auto-reloads when done
 - Stats bar: total signals in DB, high / medium / low counts
@@ -233,7 +243,7 @@ socrates-finds-you/
 ├── storage/
 │   └── db.py                # SQLite — init, save, get_unmatched, update, report
 ├── reporter/
-│   └── daily_report.py      # Markdown report generator, tier-sorted
+│   └── daily_report.py      # Markdown + HTML report generator, tier+service sorted
 ├── docs/
 │   ├── 01-services.md       # Full service menu
 │   ├── 02-platforms.md      # Platform priority rationale
@@ -242,6 +252,7 @@ socrates-finds-you/
 ├── data/                    # SQLite database — gitignored
 ├── app.py                   # Flask web dashboard
 ├── main.py                  # Pipeline entry point
+├── push_report.sh           # Publish HTML report to GitHub Pages
 ├── requirements.txt
 └── .env.example
 ```

@@ -13,25 +13,43 @@ logger = logging.getLogger(__name__)
 MODEL = "claude-sonnet-4-5"
 BATCH_SIZE = 10
 
-SYSTEM_PROMPT = """You are a matching assistant for Dong Zhang, Ph.D. — a STEM and AI mentor.
+SYSTEM_PROMPT = """You are a lead-qualification assistant for Dong Zhang, Ph.D. — a STEM and AI mentor.
+
+Your job is to identify posts where the person is ACTIVELY SEEKING HELP and likely to respond to outreach — not just mentioning a relevant topic.
 
 He offers these services:
-
-HIGH VALUE (PhD students, professionals):
 - PhD to Industry Transition Coaching
 - AI Career Path Planning
 - Applied AI Project Coaching for Career Switchers
 - AI Upskilling for Professionals
-
-MEDIUM VALUE (college students, early-career):
 - AI / ML Learning Path Coaching
 - College-Level STEM Tutoring
 - Research / Independent Project Coaching
-
-LOWER VALUE (high school students, parents):
 - AI Project Mentorship for High School Students
 - AP / SAT / ACT Math Tutoring
-- AI Literacy for Students"""
+- AI Literacy for Students
+
+CONVERSION CRITERIA — use these to set matched and client_tier:
+
+HIGH conversion (matched=true, client_tier="high") — person has clear intent and is ready to act:
+- Explicitly asks how to transition from PhD/academia to industry
+- Explicitly seeks an AI/ML learning path or career advice with clear action intent ("I want to start", "what should I do", "how do I get into")
+- Parent explicitly looking for SAT/AP/STEM tutor for their child
+- Has a specific problem and is actively seeking help or asking for advice
+
+MEDIUM conversion (matched=true, client_tier="medium") — interested but less decisive:
+- Interested in career transition but still hesitant or exploratory
+- Wants to learn AI/ML but direction is unclear or vague
+- Student seeking project or research direction guidance
+
+NO conversion (matched=false) — do not surface these:
+- Pure emotional venting: "PhD is so hard", "I'm a failure", "I'm burnt out" — no request for help
+- Pure complaint posts with no ask for advice
+- Posts completely unrelated to the services above
+- Posts where the person is just sharing news or an update, not seeking guidance
+- Ambiguous mentions of AI/ML with no coaching or learning need
+
+Be strict: when in doubt, set matched=false. A false negative is better than a false positive that wastes outreach effort."""
 
 
 def _build_user_prompt(batch: list[dict]) -> str:
@@ -46,12 +64,15 @@ def _build_user_prompt(batch: list[dict]) -> str:
         for s in batch
     ]
     return (
-        "Evaluate these posts. For each return:\n"
-        "- matched: true if there is a real learning/coaching/transition need\n"
+        "Evaluate each post for CONVERSION LIKELIHOOD — is this person actively seeking help and "
+        "likely to respond to outreach? Apply the conversion criteria from your instructions strictly.\n\n"
+        "For each post return:\n"
+        "- matched: true only if person is actively seeking help (not just venting or sharing)\n"
         "- service_match: specific service name from the list (or null)\n"
-        "- client_tier: 'high', 'medium', or 'low'\n"
+        "- client_tier: 'high' (clear intent + ready to act), 'medium' (interested but hesitant), "
+        "or 'low' (weak signal — only use if matched=true but barely qualifies)\n"
         "- confidence: 'high', 'medium', or 'low'\n"
-        "- reasoning: one sentence max\n"
+        "- reasoning: one sentence — cite the specific signal that drove your decision\n"
         "- suggested_reply: if matched=true, write a short Reddit reply (2-4 sentences) that "
         "directly addresses the person's specific problem, provides genuine value, and ends with "
         "a soft invitation like 'Happy to share more if useful' or 'Feel free to DM if you want "
