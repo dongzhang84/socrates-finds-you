@@ -13,15 +13,11 @@ fi
 
 HTML_SRC="output/report_${TODAY}.html"
 
-if [[ -f "$HTML_SRC" ]]; then
-  echo "==> Report already exists: $HTML_SRC — skipping generation."
-else
-  echo "==> Generating report for ${TODAY}..."
-  python3 reporter/daily_report.py
-  if [[ ! -f "$HTML_SRC" ]]; then
-    echo "ERROR: Expected $HTML_SRC not found after report generation." >&2
-    exit 1
-  fi
+echo "==> Generating report for ${TODAY}..."
+python3 reporter/daily_report.py
+if [[ ! -f "$HTML_SRC" ]]; then
+  echo "ERROR: Expected $HTML_SRC not found after report generation." >&2
+  exit 1
 fi
 
 echo "==> Switching to gh-pages branch..."

@@ -92,7 +92,7 @@ Publishes the daily HTML report to GitHub Pages:
 ./push_report.sh                  # today's report (Seattle time)
 ./push_report.sh 2026-03-19      # specific date
 ```
-- If `output/report_${TODAY}.html` already exists, skips regeneration
+- Always regenerates the report before pushing (never skips)
 - Checks out `gh-pages`, copies HTML to `index.html`, commits, pushes, returns to `main`
 - Live at: https://dongzhang84.github.io/socrates-finds-you
 

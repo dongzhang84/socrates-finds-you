@@ -7,7 +7,7 @@ from zoneinfo import ZoneInfo
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from storage.db import get_report_candidates, mark_included_in_report
+from storage.db import get_report_candidates
 
 logger = logging.getLogger(__name__)
 
@@ -274,7 +274,7 @@ def generate_report() -> str:
 
     OUTPUT_DIR.mkdir(exist_ok=True)
 
-    signals = get_report_candidates()
+    signals = get_report_candidates(date_str)
     signals.sort(key=lambda s: TIER_ORDER.get((s.get("client_tier") or "low").lower(), 99))
 
     md_path = OUTPUT_DIR / f"report_{date_str}.md"
@@ -282,9 +282,6 @@ def generate_report() -> str:
 
     md_path.write_text(_build_markdown(signals, date_str, now), encoding="utf-8")
     html_path.write_text(_build_html(signals, date_str, now), encoding="utf-8")
-
-    if signals:
-        mark_included_in_report([s["id"] for s in signals])
 
     logger.info("[reporter] Saved: %s and %s (%d leads)", md_path, html_path, len(signals))
     return str(html_path)

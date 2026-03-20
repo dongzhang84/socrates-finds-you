@@ -166,13 +166,15 @@ def update_suggested_reply(id: str, suggested_reply: str) -> None:
         conn.commit()
 
 
-def get_report_candidates() -> list[dict]:
+def get_report_candidates(date: str) -> list[dict]:
+    """Return all matched signals scraped on the given date (YYYY-MM-DD)."""
     with _connect() as conn:
         rows = conn.execute(
             """
             SELECT * FROM signals
-            WHERE matched = TRUE AND included_in_report = FALSE
-            """
+            WHERE matched = TRUE AND DATE(scraped_at) = ?
+            """,
+            (date,),
         ).fetchall()
     results = [dict(r) for r in rows]
     results.sort(key=lambda r: CONFIDENCE_ORDER.get(r.get("confidence") or "", 99))

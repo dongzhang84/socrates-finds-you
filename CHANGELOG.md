@@ -8,10 +8,18 @@ All notable changes to this project are documented here.
 
 ---
 
+## [2.0.1] — 2026-03-20
+
+### Fixed
+- `push_report.sh` — removed early-exit that skipped report regeneration when the HTML file already existed. The stale file caused GitHub Pages to show fewer leads than the Flask dashboard when new signals were matched after the first run of the day.
+- `reporter/daily_report.py` / `storage/db.py` — `get_report_candidates()` was filtering by `included_in_report = FALSE`, so any re-run of the reporter produced an empty report (all signals already marked). Now filters by `DATE(scraped_at) = <today>`, matching the same logic as `_get_leads()` in the Flask dashboard. The `mark_included_in_report` call is removed since it served no further purpose.
+
+---
+
 ## [2.0.0] — 2026-03-20
 
 ### Added
-- `push_report.sh` — one-command script to publish the daily HTML report to GitHub Pages (`gh-pages` branch → `index.html`). Accepts an optional date argument (`./push_report.sh 2026-03-19`); skips Python report generation if the HTML file already exists. Live at: https://dongzhang84.github.io/socrates-finds-you
+- `push_report.sh` — one-command script to publish the daily HTML report to GitHub Pages (`gh-pages` branch → `index.html`). Accepts an optional date argument (`./push_report.sh 2026-03-19`). Live at: https://dongzhang84.github.io/socrates-finds-you
 - `reporter/daily_report.py` — now generates a standalone **HTML report** (`output/report_YYYY-MM-DD.html`) alongside the existing Markdown. Includes all leads grouped by tier, with title, platform, service match, confidence, reasoning, suggested reply, clickable URL, **Copy** button (pure JS clipboard), and **Mark as Replied** button (pure JS, visual toggle, resets on refresh). No Flask dependency.
 - HTML report: **Copy button** on each lead card — copies suggested reply to clipboard; flashes "Copied!" for 2 s then resets.
 - HTML report: **Mark as Replied button** on each lead card — turns green ("✅ Replied") on click; visual only, no persistence.
