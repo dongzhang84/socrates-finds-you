@@ -1,6 +1,8 @@
 import argparse
 import logging
 import time
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 logging.basicConfig(
     level=logging.INFO,
@@ -46,7 +48,7 @@ REDDIT_SUBREDDITS = [
     # TIER_HIGH
     "PhD", "AskAcademia", "datascience", "MachineLearning",
     # TIER_MEDIUM
-    "cscareerquestions", "learnmachinelearning", "GradSchool",
+    "learnmachinelearning", "GradSchool",
     # TIER_LOW
     "SAT", "ApplyingToCollege", "learnpython",
 ]
@@ -184,6 +186,43 @@ def run_matching(unmatched: list[dict]) -> int:
     return count
 
 
+def _print_pipeline_summary(
+    scraped_by_platform: dict[str, int],
+    date: str,
+    elapsed: float,
+) -> None:
+    from storage.db import get_platform_summary
+
+    db = get_platform_summary(date)
+    platforms = sorted(set(list(scraped_by_platform) + list(db)))
+
+    col = 22
+    header = f"{'Platform':<{col}} {'Scraped':>8} {'Matched':>8} {'Filtered':>9}"
+    sep = "-" * len(header)
+
+    lines = [
+        "",
+        "=" * len(header),
+        f"  PIPELINE SUMMARY — {date}  ({elapsed:.0f}s)",
+        f"  {header}",
+        f"  {sep}",
+    ]
+    total_scraped = total_matched = 0
+    for p in platforms:
+        scraped = scraped_by_platform.get(p, 0)
+        matched = db.get(p, {}).get("matched", 0)
+        total_scraped += scraped
+        total_matched += matched
+        lines.append(f"  {p:<{col}} {scraped:>8} {matched:>8} {scraped - matched:>9}")
+    lines += [
+        f"  {sep}",
+        f"  {'TOTAL':<{col}} {total_scraped:>8} {total_matched:>8} {total_scraped - total_matched:>9}",
+        "=" * len(header),
+        "",
+    ]
+    print("\n".join(lines))
+
+
 def run_fix_replies() -> None:
     from matcher.claude_match import generate_replies
     from storage.db import get_matched_without_reply, update_suggested_reply
@@ -219,12 +258,16 @@ def main() -> None:
 
     new_signals = 0
     matched_count = 0
+    scraped_by_platform: dict[str, int] = {}
 
     # ------------------------------------------------------------------
     # Scraping phase
     # ------------------------------------------------------------------
     if not args.no_scrape and not args.report_only:
         all_signals = run_scraping(args)
+
+        for s in all_signals:
+            scraped_by_platform[s["platform"]] = scraped_by_platform.get(s["platform"], 0) + 1
 
         # Attach composite id expected by db layer: "{platform}:{external_id}"
         for s in all_signals:
@@ -256,6 +299,9 @@ def main() -> None:
         "[main] Done in %.1fs — %d new signals, %d matched, report saved to %s",
         elapsed, new_signals, matched_count, report_path,
     )
+
+    today_date = datetime.now(ZoneInfo("America/Los_Angeles")).strftime("%Y-%m-%d")
+    _print_pipeline_summary(scraped_by_platform, today_date, elapsed)
 
 
 if __name__ == "__main__":

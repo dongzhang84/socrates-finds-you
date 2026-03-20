@@ -8,6 +8,17 @@ All notable changes to this project are documented here.
 
 ---
 
+## [2.0.2] — 2026-03-20
+
+### Added
+- `main.py` — pipeline summary table printed at the end of every run, showing per-platform **Scraped / Matched / Filtered** counts plus a TOTAL row.
+- `storage/db.py` — `get_platform_summary(date)` helper used by the summary.
+
+### Fixed
+- `main.py` — removed `cscareerquestions` from `REDDIT_SUBREDDITS`. It was still being scraped despite `init_db()` deleting all cscareerquestions signals on every startup, wasting one API round-trip per run.
+
+---
+
 ## [2.0.1] — 2026-03-20
 
 ### Fixed

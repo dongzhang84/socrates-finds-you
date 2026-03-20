@@ -166,6 +166,23 @@ def update_suggested_reply(id: str, suggested_reply: str) -> None:
         conn.commit()
 
 
+def get_platform_summary(date: str) -> dict[str, dict[str, int]]:
+    """Return per-platform saved/matched counts for signals scraped on the given date."""
+    with _connect() as conn:
+        rows = conn.execute(
+            """
+            SELECT platform,
+                   COUNT(*) AS saved,
+                   SUM(CASE WHEN matched = 1 THEN 1 ELSE 0 END) AS matched
+            FROM signals
+            WHERE DATE(scraped_at) = ?
+            GROUP BY platform
+            """,
+            (date,),
+        ).fetchall()
+    return {row["platform"]: {"saved": row["saved"], "matched": row["matched"]} for row in rows}
+
+
 def get_report_candidates(date: str) -> list[dict]:
     """Return all matched signals scraped on the given date (YYYY-MM-DD)."""
     with _connect() as conn:
