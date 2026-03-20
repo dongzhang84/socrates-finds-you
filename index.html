@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>socrates-finds-you — 2026-03-20</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         background: #f5f5f5; color: #1a1a1a; line-height: 1.5; }
+  .header { background: #1a1a2e; color: #fff; padding: 20px 32px; }
+  .header h1 { font-size: 1.3rem; font-weight: 600; }
+  .header h1 span { color: #7c9eff; }
+  .header .sub { font-size: 0.85rem; color: #aaa; margin-top: 4px; }
+  .stats { background: #fff; border-bottom: 1px solid #e5e5e5;
+           padding: 14px 32px; display: flex; gap: 24px; flex-wrap: wrap; }
+  .stat { text-align: center; }
+  .stat-num { font-size: 1.4rem; font-weight: 700; }
+  .stat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: #888; }
+  .stat.high .stat-num { color: #e53e3e; }
+  .stat.medium .stat-num { color: #d97706; }
+  .stat.low .stat-num { color: #38a169; }
+  .stat.total .stat-num { color: #3b82f6; }
+  .divider { width: 1px; height: 36px; background: #e5e5e5; }
+  .main { max-width: 920px; margin: 28px auto; padding: 0 20px 60px; }
+  .tier-section { margin-bottom: 32px; }
+  .tier-header { display: flex; align-items: center; gap: 10px;
+                 padding: 10px 0; border-bottom: 2px solid; margin-bottom: 14px; }
+  .tier-title { font-size: 0.95rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+  .tier-count { font-size: 0.78rem; color: #888; background: #f0f0f0;
+                border-radius: 10px; padding: 1px 8px; }
+  .lead { background: #fff; border: 1px solid #e8e8e8; border-radius: 10px;
+          padding: 16px 18px; margin-bottom: 10px; }
+  .lead-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 8px; color: #111; }
+  .lead-title a { color: inherit; text-decoration: none; }
+  .lead-title a:hover { text-decoration: underline; color: #2563eb; }
+  .lead-meta { display: flex; flex-wrap: wrap; gap: 6px; font-size: 0.78rem; }
+  .badge { display: inline-flex; align-items: center; padding: 2px 8px;
+           border-radius: 12px; font-weight: 500; }
+  .badge-platform { background: #eff6ff; color: #1d4ed8; }
+  .badge-service { background: #f0fdf4; color: #166534; }
+  .badge-conf { background: #fef3c7; color: #92400e; }
+  .lead-reasoning { font-size: 0.82rem; color: #555; margin-top: 8px;
+                    padding-top: 8px; border-top: 1px solid #f0f0f0; }
+  .reply-section { margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0f0; }
+  .reply-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+                 letter-spacing: 0.5px; color: #888; margin-bottom: 5px; }
+  .reply-text { font-size: 0.82rem; color: #333; line-height: 1.55;
+                background: #f8f9ff; border-left: 3px solid #93c5fd;
+                padding: 8px 10px; border-radius: 0 6px 6px 0; white-space: pre-wrap; }
+  .empty { text-align: center; padding: 48px 20px; color: #888; font-size: 0.9rem; }
+  .footer { text-align: center; font-size: 0.75rem; color: #aaa; margin-top: 40px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>socrates<span>-finds-you</span></h1>
+  <div class="sub">Daily Lead Report — 2026-03-20</div>
+</div>
+<div class="stats">
+  <div class="stat total"><div class="stat-num">0</div><div class="stat-label">Total leads</div></div>
+  <div class="divider"></div>
+  <div class="stat high"><div class="stat-num">0</div><div class="stat-label">High value</div></div>
+  <div class="stat medium"><div class="stat-num">0</div><div class="stat-label">Medium value</div></div>
+  <div class="stat low"><div class="stat-num">0</div><div class="stat-label">Low value</div></div>
+</div>
+<div class="main">
+
+  <div class="tier-section">
+    <div class="tier-header" style="border-color:#e53e3e">
+      <span>🔴</span>
+      <span class="tier-title">High Value — PhD / Professionals</span>
+      <span class="tier-count">0</span>
+    </div>
+    <p style="color:#aaa;font-style:italic;font-size:0.85rem;">No leads in this tier today.</p>
+  </div>
+
+  <div class="tier-section">
+    <div class="tier-header" style="border-color:#d97706">
+      <span>🟡</span>
+      <span class="tier-title">Medium Value — College / Early Career</span>
+      <span class="tier-count">0</span>
+    </div>
+    <p style="color:#aaa;font-style:italic;font-size:0.85rem;">No leads in this tier today.</p>
+  </div>
+
+  <div class="tier-section">
+    <div class="tier-header" style="border-color:#38a169">
+      <span>🟢</span>
+      <span class="tier-title">Low Value — High School / Students</span>
+      <span class="tier-count">0</span>
+    </div>
+    <p style="color:#aaa;font-style:italic;font-size:0.85rem;">No leads in this tier today.</p>
+  </div>
+
+<div class="empty"><p>No matched leads today.</p><p>Run the pipeline to scrape and match new signals.</p></div>
+  <div class="footer">Generated 2026-03-20 01:27:52 UTC</div>
+</div>
+</body>
+</html>
