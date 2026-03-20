@@ -48,6 +48,11 @@
   .reply-text { font-size: 0.82rem; color: #333; line-height: 1.55;
                 background: #f8f9ff; border-left: 3px solid #93c5fd;
                 padding: 8px 10px; border-radius: 0 6px 6px 0; white-space: pre-wrap; }
+  .copy-btn { margin-top: 6px; padding: 3px 10px; font-size: 0.75rem; font-weight: 500;
+              background: #fff; border: 1px solid #d1d5db; border-radius: 5px;
+              cursor: pointer; color: #555; transition: all 0.15s; }
+  .copy-btn:hover { background: #f0f0f0; border-color: #aaa; }
+  .copy-btn.copied { background: #d1fae5; border-color: #6ee7b7; color: #065f46; }
   .empty { text-align: center; padding: 48px 20px; color: #888; font-size: 0.9rem; }
   .footer { text-align: center; font-size: 0.75rem; color: #aaa; margin-top: 40px; }
 </style>
@@ -58,11 +63,11 @@
   <div class="sub">Daily Lead Report — 2026-03-19</div>
 </div>
 <div class="stats">
-  <div class="stat total"><div class="stat-num">0</div><div class="stat-label">Total leads</div></div>
+  <div class="stat total"><div class="stat-num">44</div><div class="stat-label">Total leads</div></div>
   <div class="divider"></div>
-  <div class="stat high"><div class="stat-num">0</div><div class="stat-label">High value</div></div>
-  <div class="stat medium"><div class="stat-num">0</div><div class="stat-label">Medium value</div></div>
-  <div class="stat low"><div class="stat-num">0</div><div class="stat-label">Low value</div></div>
+  <div class="stat high"><div class="stat-num">18</div><div class="stat-label">High value</div></div>
+  <div class="stat medium"><div class="stat-num">25</div><div class="stat-label">Medium value</div></div>
+  <div class="stat low"><div class="stat-num">1</div><div class="stat-label">Low value</div></div>
 </div>
 <div class="main">
 
@@ -70,31 +75,478 @@
     <div class="tier-header" style="border-color:#e53e3e">
       <span>🔴</span>
       <span class="tier-title">High Value — PhD / Professionals</span>
-      <span class="tier-count">0</span>
+      <span class="tier-count">18</span>
     </div>
-    <p style="color:#aaa;font-style:italic;font-size:0.85rem;">No leads in this tier today.</p>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/learnmachinelearning/comments/1rxp6t6/cs_vs_stats_degree_for_ml_engineer/" target="_blank" rel="noopener">CS vs. Stats degree for ML Engineer?</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/learnmachinelearning</span>
+        <span class="badge badge-service">AI Career Path Planning</span>
+        <span class="badge badge-conf">high confidence</span>
+      </div>
+      <div class="lead-reasoning">Person is actively deciding between two degree paths for ML Engineer career and explicitly asking for advice from people in the field.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-high-0">Having worked with both backgrounds: Stats/Math gives you stronger model intuition, but CS makes production engineering much easier. The sweet spot is CS + self-studying the math (Gilbert Strang&#x27;s linear algebra, Bishop&#x27;s PRML). Most MLE roles care more about your ability to ship models than derive loss functions from scratch. Happy to share more about the tradeoffs if useful.</div><button class="copy-btn" onclick="copyReply('reply-high-0', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/learnmachinelearning/comments/1rxap8p/diploma_projects_no_uni_degree_any_chance_at/" target="_blank" rel="noopener">Diploma projects, no uni degree any chance at junior AI/ML jobs in Canada?</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/learnmachinelearning</span>
+        <span class="badge badge-service">AI Career Path Planning</span>
+        <span class="badge badge-conf">high confidence</span>
+      </div>
+      <div class="lead-reasoning">Person explicitly asks about career transition feasibility into AI/ML with clear context about their background and current upskilling efforts, showing active decision-making intent.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-high-1">Your project portfolio (TapTrack, warehouse scanner, deployed bot) is actually more valuable than many CS degrees for junior roles — you&#x27;ve shipped real things. The challenge in Canada isn&#x27;t your diploma vs degree, it&#x27;s that junior AI/ML roles are extremely competitive right now and most want 1-2 years experience even for &#x27;junior&#x27;. Focus on one clear specialty (CV, NLP, or MLOps) and build 2-3 projects that go deeper than tutorials. Happy to share what hiring managers actually look for if you want to dig into this.</div><button class="copy-btn" onclick="copyReply('reply-high-1', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/learnmachinelearning/comments/1rxaj3i/i_feel_outdated/" target="_blank" rel="noopener">I feel outdated</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/learnmachinelearning</span>
+        <span class="badge badge-service">AI Upskilling for Professionals</span>
+        <span class="badge badge-conf">high confidence</span>
+      </div>
+      <div class="lead-reasoning">Explicitly asks for book/course recommendations to upskill from traditional ML to LLMs/AI engineering with specific learning goals — clear action intent.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-high-2">The gap between traditional ML and LLMs/agents is real, but you&#x27;ve got a solid foundation to build on. I&#x27;d start with hands-on projects rather than books — pick one thing (like building a RAG app with your own hosted model) and work backwards to fill knowledge gaps as you go. The hosting/scaling piece is where your MLops background will shine. Happy to share a more structured learning path if useful.</div><button class="copy-btn" onclick="copyReply('reply-high-2', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/learnmachinelearning/comments/1rxpni2/detector_de_imgenes_con_ia/" target="_blank" rel="noopener">Detector de imgenes con IA</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/learnmachinelearning</span>
+        <span class="badge badge-service">Applied AI Project Coaching for Career Switchers</span>
+        <span class="badge badge-conf">high confidence</span>
+      </div>
+      <div class="lead-reasoning">Student has a specific project (AI image detector) and is explicitly asking for guidance on how to approach it and how to start the code implementation.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-high-3">Para detectar imágenes generadas por IA sin deep learning, podrías enfocarte en análisis de frecuencias (FFT), artefactos de compresión, o inconsistencias en metadatos. En Matlab, Error Level Analysis (ELA) es un buen punto de partida. Si quieres, puedo compartir más detalles sobre cómo estructurar el proyecto. ¡Suerte!</div><button class="copy-btn" onclick="copyReply('reply-high-3', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/learnmachinelearning/comments/1rxhbi6/text_2_speech_model/" target="_blank" rel="noopener">Text 2 speech model</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/learnmachinelearning</span>
+        <span class="badge badge-service">Applied AI Project Coaching for Career Switchers</span>
+        <span class="badge badge-conf">high confidence</span>
+      </div>
+      <div class="lead-reasoning">Direct request for help building a custom TTS model with clear action intent.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-high-4">Building a custom TTS model depends a lot on your use case and data. If you&#x27;re starting from scratch, fine-tuning something like Coqui TTS or Tortoise is usually way more practical than training from zero. What&#x27;s your end goal — realistic voice cloning, a specific language, or something else? Happy to point you in the right direction if you want to share more details.</div><button class="copy-btn" onclick="copyReply('reply-high-4', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/PhD/comments/1rxd6kj/best_tips_for_looking_for_jobs/" target="_blank" rel="noopener">Best tips for looking for jobs?</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/PhD</span>
+        <span class="badge badge-service">PhD to Industry Transition Coaching</span>
+        <span class="badge badge-conf">high confidence</span>
+      </div>
+      <div class="lead-reasoning">Recent PhD grad needing immediate job search help with absent advisor support.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-high-5">Congrats on defending! The PhD-to-industry job search is its own skill set that most advisors don&#x27;t teach. A few tactical things: tailor your resume to translate research skills into business value (not just listing publications), leverage LinkedIn aggressively, and consider contract/consulting roles while searching for permanent positions since you need income now. Happy to share more specific strategies if useful — the transition is very doable but requires reframing how you present yourself.</div><button class="copy-btn" onclick="copyReply('reply-high-5', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/PhD/comments/1rwzs0w/what_to_do_when_youve_tried_everything/" target="_blank" rel="noopener">What to do when you&#x27;ve tried everything?</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/PhD</span>
+        <span class="badge badge-service">PhD to Industry Transition Coaching</span>
+        <span class="badge badge-conf">high confidence</span>
+      </div>
+      <div class="lead-reasoning">PhD student stuck in impossible academic situation, likely needs help pivoting to industry.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-high-6">This sounds absolutely brutal, and I&#x27;m sorry you&#x27;re dealing with institutional failure at this level. Given the timeline and lack of resolution, you might want to start seriously considering what your exit options look like—whether that&#x27;s industry, a different academic institution, or something else entirely. Sometimes the healthiest move is accepting the situation won&#x27;t resolve and building your next step. Happy to share thoughts on navigating transitions from messy PhD situations if that&#x27;s helpful.</div><button class="copy-btn" onclick="copyReply('reply-high-6', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/PhD/comments/1rwyxce/job_market_in_india/" target="_blank" rel="noopener">Job market in India</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/PhD</span>
+        <span class="badge badge-service">PhD to Industry Transition Coaching</span>
+        <span class="badge badge-conf">high confidence</span>
+      </div>
+      <div class="lead-reasoning">PhD graduate struggling with post-PhD job search, facing overqualification issues and unclear transition strategy.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-high-7">The &#x27;overqualified&#x27; response often means they think you&#x27;ll leave for a better role or expect higher compensation than budgeted. For industry roles, try reframing your PhD as solving specific business problems rather than listing academic credentials - highlight the 3-4 transferable skills that matter for each role. Happy to share more strategies if useful.</div><button class="copy-btn" onclick="copyReply('reply-high-7', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/AskAcademia/comments/1rxn3u0/burnt_out_yet_got_the_phd_offers_i_once_dreamt_of/" target="_blank" rel="noopener">Burnt out, yet got the PhD offers I once dreamt of, and now not sure what to do... I think I need advice and a place to rant</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/AskAcademia</span>
+        <span class="badge badge-service">PhD to Industry Transition Coaching</span>
+        <span class="badge badge-conf">high confidence</span>
+      </div>
+      <div class="lead-reasoning">Masters student with PhD offers experiencing burnout and questioning whether to continue in academia, needs career path clarity.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-high-8">Burnout after finishing Oxford while visiting top PhD programs is completely normal - you&#x27;re running on fumes and trying to make a huge decision. The fact that you&#x27;re questioning it isn&#x27;t a red flag; it&#x27;s actually wise to interrogate this before committing 5-7 years. Take a week to not think about it at all, then map out what you actually want your life to look like in 5 years (day-to-day, not just titles) - that usually clarifies whether the PhD path fits. Happy to share more on evaluating PhD vs industry paths if useful.</div><button class="copy-btn" onclick="copyReply('reply-high-8', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/AskAcademia/comments/1rxeaml/advice_for_applied_math_phd_moving_to_a_cs_postdoc/" target="_blank" rel="noopener">Advice for applied math PhD moving to a CS postdoc?</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/AskAcademia</span>
+        <span class="badge badge-service">PhD to Industry Transition Coaching</span>
+        <span class="badge badge-conf">high confidence</span>
+      </div>
+      <div class="lead-reasoning">PhD-level professional navigating academic career path and positioning for faculty jobs, clear coaching need.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-high-9">The biggest difference you&#x27;ll hit is publication velocity—CS values conferences as much as journals, and the timeline is way faster. Start building your conference presence now and get comfortable with preprints/arXiv. Also, when job hunting, frame your math background as an asset for theory-heavy CS areas rather than apologizing for the non-CS PhD. Happy to share more about positioning yourself on the academic market if useful.</div><button class="copy-btn" onclick="copyReply('reply-high-9', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/AskAcademia/comments/1rxc2lk/question_for_academics_whove_dealt_with_mental/" target="_blank" rel="noopener">Question for academics who&#x27;ve dealt with mental health issues - I got admitted into PhD programs but am extremely burnt out. Would it be dumb to take a break?</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/AskAcademia</span>
+        <span class="badge badge-service">PhD to Industry Transition Coaching</span>
+        <span class="badge badge-conf">high confidence</span>
+      </div>
+      <div class="lead-reasoning">CS PhD student considering industry pivot due to burnout—classic transition scenario.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-high-10">That burnout is real and incredibly common at this stage. I&#x27;ve coached several CS PhD students through this exact decision point—the key is figuring out whether it&#x27;s program-specific exhaustion or a deeper misalignment with research life. Sometimes a short industry stint (even 6-12 months) can clarify what you actually want, and you can always return to the PhD with better perspective or leverage those offers for better positioning. Happy to share more about how to evaluate this systematically if useful.</div><button class="copy-btn" onclick="copyReply('reply-high-10', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/AskAcademia/comments/1rx03s7/what_to_do_when_youve_tried_everything/" target="_blank" rel="noopener">What to do when you&#x27;ve tried everything?</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/AskAcademia</span>
+        <span class="badge badge-service">PhD to Industry Transition Coaching</span>
+        <span class="badge badge-conf">high confidence</span>
+      </div>
+      <div class="lead-reasoning">Biological sciences PhD facing severe advisor issues and unclear completion path, likely needs transition planning to industry.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-high-11">This is a brutal situation and I&#x27;m sorry you&#x27;re dealing with it. Given the mediation failures and contract expiration, you might want to start thinking about your options beyond academia - your skills are absolutely transferable to biotech, pharma, or data science roles even without the final degree. The Switzerland/EU job market for bio PhD backgrounds is actually pretty strong right now. Happy to share more about pivoting your narrative and what hiring managers actually care about if useful.</div><button class="copy-btn" onclick="copyReply('reply-high-11', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/PhD/comments/1rxr08s/prelim_is_making_me_second_guess_if_i_belong_in_a/" target="_blank" rel="noopener">Prelim is making me second guess if I belong in a PhD at all</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/PhD</span>
+        <span class="badge badge-service">PhD to Industry Transition Coaching</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">PhD student questioning whether to continue, potentially ready to explore industry alternatives.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-high-12">The prelim grind is brutal, especially when you&#x27;re in one of those high-pressure subfields. That questioning whether you belong is actually super common at this stage—it doesn&#x27;t mean you&#x27;re not cut out for it. Something that helped me was separating &quot;do I belong in academia&quot; from &quot;do I belong doing this type of work&quot;—sometimes the answer is that your skills are amazing but the environment isn&#x27;t the right fit. Happy to share more about how to think through these crossroads if useful.</div><button class="copy-btn" onclick="copyReply('reply-high-12', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/PhD/comments/1rxbiv2/got_admitted_into_cs_phd_programs_but_extremely/" target="_blank" rel="noopener">Got admitted into CS PhD programs but extremely burnt out. Would it be dumb to take a break?</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/PhD</span>
+        <span class="badge badge-service">PhD to Industry Transition Coaching</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">CS student with PhD offers considering industry break, weighing PhD vs industry career paths.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-high-13">Burnout before starting is real and worth taking seriously. A year or two in industry won&#x27;t close doors — actually, it often clarifies whether you want the PhD for the right reasons or gives you applied skills that make the PhD more focused. Some programs allow deferral; others you&#x27;d reapply later (and with industry experience, you&#x27;d likely be more competitive). The key question is whether you&#x27;re burnt out from the grind or burnt out from uncertainty about the path itself. Feel free to DM if you want to dig into this — I&#x27;ve seen both paths work well for different people.</div><button class="copy-btn" onclick="copyReply('reply-high-13', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/PhD/comments/1rx5xon/trying_to_find_a_suitable_post_doc_mentor/" target="_blank" rel="noopener">Trying to find a suitable post doc mentor</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/PhD</span>
+        <span class="badge badge-service">PhD to Industry Transition Coaching</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">Two years post-PhD submission seeking postdoc opportunities, could benefit from career navigation coaching.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-high-14">The postdoc search in specific regions can be brutal, especially with the time gap. One thing that helped me was reframing the search—treating it less like job applications and more like finding the right collaboration fit. Sometimes reaching out directly to PIs with a specific research idea (not just a CV blast) gets better traction than formal portals. Happy to share more about how I navigated my own transition if useful.</div><button class="copy-btn" onclick="copyReply('reply-high-14', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/AskAcademia/comments/1rxjd40/tenuretrack_zoom_interview_r2/" target="_blank" rel="noopener">Tenure-track zoom interview R2</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/AskAcademia</span>
+        <span class="badge badge-service">PhD to Industry Transition Coaching</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">PhD-level professional preparing for academic interview could benefit from career coaching, though they&#x27;re staying in academia.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-high-15">For R2 positions, they&#x27;ll want to see you can balance research with teaching—be ready to talk about mentoring undergrads through projects, not just publishing. Come with 1-2 specific ideas for courses you&#x27;d develop and how you&#x27;d involve students in your research pipeline. Happy to share more about positioning yourself if useful.</div><button class="copy-btn" onclick="copyReply('reply-high-15', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/AskAcademia/comments/1rx9iex/can_geographic_restrictionspreferences_ruin/" target="_blank" rel="noopener">Can geographic restrictions/preferences ruin academic career?</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/AskAcademia</span>
+        <span class="badge badge-service">PhD to Industry Transition Coaching</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">Recent PhD struggling with career transition and job search strategy, though field unclear.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-high-16">The geographic constraint is tough but definitely manageable—I&#x27;ve worked with several PhDs who navigated this successfully. The key is usually being more strategic about how you&#x27;re positioning yourself for non-academic roles (most PhDs undersell their transferable skills) and potentially expanding the *type* of roles you&#x27;re targeting within your geography. The fact that you landed something is actually a good sign; now it&#x27;s about using that as a bridge while you build local visibility. Feel free to DM if you want to dig into search strategy.</div><button class="copy-btn" onclick="copyReply('reply-high-16', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/AskAcademia/comments/1rxrqsp/publication_help_for_a_hser/" target="_blank" rel="noopener">Publication Help For a HSER</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/AskAcademia</span>
+        <span class="badge badge-service">Research / Independent Project Coaching</span>
+        <span class="badge badge-conf">high confidence</span>
+      </div>
+      <div class="lead-reasoning">High school junior actively seeking publication strategy advice for a medical device project with clear timeline pressure — explicit request for guidance.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-high-17">Congrats on getting to the validation stage! For timeline + prestige balance, Scientific Reports is solid (fast peer review, respectable IF). OJEMB timelines can be optimistic depending on reviewer availability. One thing to consider: does the journal audience match where you want this work to land (clinical vs. engineering community)? Happy to share more thoughts on positioning your manuscript if useful.</div><button class="copy-btn" onclick="copyReply('reply-high-17', this)">Copy</button></div>
+    </div>
   </div>
 
   <div class="tier-section">
     <div class="tier-header" style="border-color:#d97706">
       <span>🟡</span>
       <span class="tier-title">Medium Value — College / Early Career</span>
-      <span class="tier-count">0</span>
+      <span class="tier-count">25</span>
     </div>
-    <p style="color:#aaa;font-style:italic;font-size:0.85rem;">No leads in this tier today.</p>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/AskAcademia/comments/1rxfbaj/non_chem_e_pursuing_chem_e_grad_work_advice/" target="_blank" rel="noopener">non chem e pursuing chem e grad work — advice?</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/AskAcademia</span>
+        <span class="badge badge-service">AI Career Path Planning</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">Career switcher from humanities to STEM/biotech with clear learning path needs, though not directly AI-focused.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-medium-0">The gap you&#x27;re facing is real but not insurmountable—you&#x27;ll need core chem/bio engineering fundamentals before diving into synthetic biology programs. Look for bridge programs or post-bacc options that specifically feed into bioengineering PhDs, and consider reaching out to PIs doing microbial engineering to ask what prerequisites they actually care about (it&#x27;s often less than you think). Feel free to DM if you want to dig into mapping out a realistic path from where you are now.</div><button class="copy-btn" onclick="copyReply('reply-medium-0', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/AskAcademia/comments/1rx95vi/is_my_plan_good_enough_to_enter_academia/" target="_blank" rel="noopener">Is my plan good enough to enter academia?</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/AskAcademia</span>
+        <span class="badge badge-service">AI Career Path Planning</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">Engineering student planning academic/teaching career path, could benefit from career planning though not explicitly AI-focused.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-medium-1">Your plan is solid in structure (work → MSc → PhD → teaching), but I&#x27;d suggest being more intentional about which teaching track you&#x27;re targeting. Tenure-track research positions vs. teaching-focused positions have very different requirements, and your industry experience + MSc focus should align with that goal. Also, if you&#x27;re interested in audio/embedded systems, there&#x27;s actually growing demand for people who can bridge traditional engineering with ML/AI applications in those domains—worth exploring during your MSc. Happy to share more if useful.</div><button class="copy-btn" onclick="copyReply('reply-medium-1', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/datascience/comments/1rxf49a/bombed_a_data_scientist_interview/" target="_blank" rel="noopener">Bombed a Data Scientist Interview!</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/datascience</span>
+        <span class="badge badge-service">AI Career Path Planning</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">Person bombed a technical interview and is reflecting on skill gaps, showing implicit awareness of need for upskilling but not explicitly asking for help.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-medium-2">That SQL/query optimization gap is super common when moving into senior DS roles — the jump from analytics-adjacent to pure data science often means leveling up on those fundamentals. The good news is it&#x27;s totally closeable with focused practice on window functions, CTEs, and execution plans. Happy to share a structured approach if you want to turn this into your next growth area.</div><button class="copy-btn" onclick="copyReply('reply-medium-2', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/MachineLearning/comments/1ry1j0g/d_how_hard_is_it_to_get_research_engineer/" target="_blank" rel="noopener">[D] How hard is it to get Research Engineer interview from Deepmind?</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/MachineLearning</span>
+        <span class="badge badge-service">AI Career Path Planning</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">New grad actively job-searching and asking about breaking into ML research roles, showing interest but uncertainty about the path forward.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-medium-3">DeepMind Research Engineer roles are competitive but your math/physics background is strong for that intersection. The key differentiator is usually demonstrable ML project work — even small implementations or contributions that show you can code research ideas, not just understand them. Your quant-research interview experience is actually good signal. Feel free to DM if you want to dig into this.</div><button class="copy-btn" onclick="copyReply('reply-medium-3', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/learnmachinelearning/comments/1rxdgvs/i_spent_months_learning_ai_and_still_couldnt_use/" target="_blank" rel="noopener">“I spent months learning AI and still couldn’t use it</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/learnmachinelearning</span>
+        <span class="badge badge-service">AI Upskilling for Professionals</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">Person shares they struggled with applying AI knowledge but found their own solution; asking if others relate suggests openness to discussion but not urgent help-seeking.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-medium-4">The application gap is real — most AI learning stays theoretical until you force yourself to build something specific. The shift from &#x27;understanding concepts&#x27; to &#x27;shipping a tool that solves one narrow problem&#x27; is where the learning actually happens. If you want to talk through what projects would actually move the needle for your goals, happy to share what&#x27;s worked for others making that jump.</div><button class="copy-btn" onclick="copyReply('reply-medium-4', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/MachineLearning/comments/1ry1mej/p_xgboost_tfidf_for_emotion_prediction_good_state/" target="_blank" rel="noopener">[P] XGBoost + TF-IDF for emotion prediction — good state accuracy but struggling with intensity (need advice)</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/MachineLearning</span>
+        <span class="badge badge-service">Applied AI Project Coaching for Career Switchers</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">Person is actively working on an ML project and explicitly asking for technical advice on improving model performance, but the ask is more technical troubleshooting than career/learning path guidance.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-medium-5">Your intensity regression setup looks solid. Two quick things to try: (1) treat intensity as ordinal classification instead of regression — this often works better for 1-5 scales, and (2) check if certain emotions systematically predict higher/lower intensity and add emotion-specific features. The metadata mix you have is rich, so feature engineering around emotion-context interactions could help. Happy to share more if useful.</div><button class="copy-btn" onclick="copyReply('reply-medium-5', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/AskAcademia/comments/1rxgf9d/advice_on_grad_school_because_i_dont_know_what_to/" target="_blank" rel="noopener">Advice on grad school because I don’t know what to do</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/AskAcademia</span>
+        <span class="badge badge-service">PhD to Industry Transition Coaching</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">Person is uncertain about grad school path and mentions being out of options, but the ask is about grad school decision-making rather than explicit transition or career coaching</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-medium-6">The uncertainty you&#x27;re feeling is totally normal - grad school decisions shouldn&#x27;t be rushed just because of deadlines. The key question isn&#x27;t which program accepted you, but what career outcome you actually want and which path gets you there most directly. Sometimes the &#x27;backup&#x27; option is actually the better fit when you think through what you want to be doing day-to-day. Happy to share more thoughts on how to think through this if useful.</div><button class="copy-btn" onclick="copyReply('reply-medium-6', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/AskAcademia/comments/1rx7rgn/just_started_my_phd_and_im_confused/" target="_blank" rel="noopener">Just started my PhD and I&#x27;m confused</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/AskAcademia</span>
+        <span class="badge badge-service">PhD to Industry Transition Coaching</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">PhD student expressing uncertainty about academic career prospects and seeking to &#x27;understand how to move in this field to secure a&#x27; [future], but question appears incomplete and lacks strong action intent.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-medium-7">Your supervisor&#x27;s being realistic about academia — it&#x27;s smart to build multiple options early. Since you love teaching law, there are actually several paths that combine legal expertise with more stability (legal tech consulting, corporate compliance training, policy advisory roles). The key is positioning your PhD work to open doors beyond pure academia. Happy to share more about how to build that optionality if useful.</div><button class="copy-btn" onclick="copyReply('reply-medium-7', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/PhD/comments/1rygmoz/phd_feels_like_its_falling_apart_funding_cuts_and/" target="_blank" rel="noopener">PhD feels like it’s falling apart, funding cuts and possible early graduation</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/PhD</span>
+        <span class="badge badge-service">PhD to Industry Transition Coaching</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">PhD student expressing distress about their situation and explicitly looking for advice, though direction (stay vs. leave) is unclear.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-medium-8">Second year can be the hardest — you&#x27;ve passed quals but the path forward isn&#x27;t clear yet, especially with advisor dynamics like yours. The fact that you thrived during your internship is actually a huge signal about what environments work for you. If you want to talk through whether to push through or pivot to industry (and how), happy to share what I&#x27;ve seen work for others in similar spots. Feel free to DM.</div><button class="copy-btn" onclick="copyReply('reply-medium-8', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/PhD/comments/1ry5l8a/broken_need_advice/" target="_blank" rel="noopener">Broken... need advice</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/PhD</span>
+        <span class="badge badge-service">PhD to Industry Transition Coaching</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">Person is in crisis with advisors leaving and situation escalating, may be open to exploring alternatives including industry transition, though not explicitly stated.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-medium-9">I&#x27;m sorry you&#x27;re going through this—advisor transitions are incredibly stressful. One thing I&#x27;ve seen help people in similar situations is taking a step back to clarify what you actually want from your career, independent of the current chaos. Sometimes that clarity makes the next decision (whether to push through or pivot) much easier. Happy to share more thoughts if useful.</div><button class="copy-btn" onclick="copyReply('reply-medium-9', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/PhD/comments/1ry3pmq/phd_advice_startup_vs_university_funded/" target="_blank" rel="noopener">PhD advice - startup vs university funded</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/PhD</span>
+        <span class="badge badge-service">PhD to Industry Transition Coaching</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">Person is seeking advice about PhD funding structure and concerned about future academic/industry prospects, showing exploratory career planning intent but not immediate action.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-medium-10">The startup route can actually strengthen your industry options later — you&#x27;ll get hands-on ML experience that translates well. For postdoc concerns: what matters most is your publications and the research quality, not the funding source. The key is staying connected to the academic community through conferences and collaborations. Happy to share more about navigating PhD-to-industry paths if useful.</div><button class="copy-btn" onclick="copyReply('reply-medium-10', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/AskAcademia/comments/1ryg0gr/religious_studies/" target="_blank" rel="noopener">Religious studies</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/AskAcademia</span>
+        <span class="badge badge-service">PhD to Industry Transition Coaching</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">Person is exploring non-academic career options (public policy/think tanks) but hasn&#x27;t started the PhD yet, showing interest but low urgency for transition coaching.</div>
+      
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/AskAcademia/comments/1rxwm3o/navigating_australia_to_us_as_a_postdoc/" target="_blank" rel="noopener">Navigating Australia to US as a Postdoc</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/AskAcademia</span>
+        <span class="badge badge-service">PhD to Industry Transition Coaching</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">PhD candidate explicitly seeking advice on finding work (including outside academia) but focus is on international job search logistics rather than career transition strategy itself.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-medium-12">The Bay Area has strong demand for marine ecology expertise in both biotech and environmental consulting. Since you&#x27;re open to non-academic roles, I&#x27;d focus your applications on showcasing how your 8 years of research translates to industry problems — many US employers undervalue international PhDs until they see the practical skills clearly. Happy to share more about positioning your research background for industry if useful.</div><button class="copy-btn" onclick="copyReply('reply-medium-12', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/learnmachinelearning/comments/1rxjkg0/having_trouble_understanding_cnn_math/" target="_blank" rel="noopener">Having trouble understanding CNN math</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/learnmachinelearning</span>
+        <span class="badge badge-service">AI / ML Learning Path Coaching</span>
+        <span class="badge badge-conf">high confidence</span>
+      </div>
+      <div class="lead-reasoning">Explicitly states confusion about CNN convolution math and seeks understanding, indicating a learning obstacle.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-medium-13">The notation confusion is super common here. Lowercase i is typically the input index, and in true convolution the kernel is flipped before sliding (vs cross-correlation which just slides). The practical difference is minimal since most frameworks just call cross-correlation &#x27;convolution&#x27; anyway. Happy to walk through the math step-by-step if you want to DM — I&#x27;ve helped a lot of people get unstuck on exactly this.</div><button class="copy-btn" onclick="copyReply('reply-medium-13', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://www.linkedin.com/feed/update/urn:li:activity:7440261648772218880/" target="_blank" rel="noopener">Just completed a Banknotes Machine Learning Classification Project and published it to GitHub, where I built and evaluat</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">linkedin</span>
+        <span class="badge badge-service">AI / ML Learning Path Coaching</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">Completed beginner ML project, showing learning initiative but needs guidance on next steps for career development.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-medium-14">Nice work on the classification project! The next big step after toy datasets is working with messy real-world data and understanding the full ML pipeline from problem formulation to deployment. I&#x27;ve coached several folks through this transition from coursework to career-relevant projects. Happy to share what typically makes the difference if useful.</div><button class="copy-btn" onclick="copyReply('reply-medium-14', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/learnmachinelearning/comments/1rxo607/ai_use_for_ml_projects/" target="_blank" rel="noopener">AI use for ML Projects</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/learnmachinelearning</span>
+        <span class="badge badge-service">AI / ML Learning Path Coaching</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">Person is asking a reflective question about how to balance AI assistance vs. self-learning in ML, showing uncertainty about their learning path and professional development.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-medium-15">Good question. In research, novelty comes from problem formulation and experimental design, not just coding. Use AI to accelerate implementation, but make sure you understand the &#x27;why&#x27; behind every architectural choice — that&#x27;s what hiring managers probe in interviews. The goal is to use AI as a multiplier, not a crutch. Feel free to DM if you want to dig into this.</div><button class="copy-btn" onclick="copyReply('reply-medium-15', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/learnmachinelearning/comments/1rxd8xo/andrej_karpathy_vs_fastai_jeremy_howard_which_is/" target="_blank" rel="noopener">Andrej Karpathy vs fast.ai jeremy howard which is the best resource to learn and explore AI+ML?</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/learnmachinelearning</span>
+        <span class="badge badge-service">AI / ML Learning Path Coaching</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">Asking which resource is best to learn AI/ML, showing interest in learning path but question is very general without clear action intent.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-medium-16">Both are solid, but it depends on your goal. Karpathy is amazing for understanding fundamentals deeply (especially if you want to build from scratch). Fast.ai gets you shipping real models faster with less math upfront. What are you trying to build or transition into? That&#x27;ll help narrow it down. Happy to share more if useful.</div><button class="copy-btn" onclick="copyReply('reply-medium-16', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/learnmachinelearning/comments/1rxctf7/i_think_the_way_we_learn_ai_is_making_it_harder/" target="_blank" rel="noopener">I think the way we learn AI is making it harder than it should be</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/learnmachinelearning</span>
+        <span class="badge badge-service">AI / ML Learning Path Coaching</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">Person identifies a learning challenge and shares what helped them, then asks if others experienced this — exploratory rather than actively seeking help.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-medium-17">Absolutely. The &#x27;learn everything first&#x27; trap is real. The breakthrough usually happens when you pick one concrete problem and let the theory fill in as you need it. What kind of small things are you building now? Feel free to DM if you want to dig into this.</div><button class="copy-btn" onclick="copyReply('reply-medium-17', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/AskAcademia/comments/1rx3i3h/first_research_proposal_dumb_questions_pls_help/" target="_blank" rel="noopener">First research proposal, dumb questions, pls help</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/AskAcademia</span>
+        <span class="badge badge-service">Research / Independent Project Coaching</span>
+        <span class="badge badge-conf">high confidence</span>
+      </div>
+      <div class="lead-reasoning">Undergraduate student needs guidance on first research proposal methodology and structure.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-medium-18">For demographics, put them under Participants (describing your sample). Confounds like caffeine can go in Materials if you&#x27;re using a structured question, or in Procedure if it&#x27;s just a single item you created. For stress, look at validated scales like the Perceived Stress Scale (PSS-10) - it&#x27;s short, widely used, and freely available. Happy to share more about structuring methods sections if useful.</div><button class="copy-btn" onclick="copyReply('reply-medium-18', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/PhD/comments/1rxpsrq/prospective_phd_2027_eyetracking_game/" target="_blank" rel="noopener">Prospective PhD (2027) - Eye-tracking &amp;amp; Game Localization: Advice on Australia/NZ funding?</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/PhD</span>
+        <span class="badge badge-service">Research / Independent Project Coaching</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">Seeking advice on PhD applications and funding but focused on logistics rather than research direction or skills development.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-medium-19">Your eye-tracking + game localization angle is solid and differentiated. For Australia/NZ funding, focus on aligning your proposal with their national research priorities (digital economy, creative industries). The key is showing how your CTS work bridges translation studies and cognitive science in a way that&#x27;s fundable. Happy to share more thoughts on framing interdisciplinary projects if useful.</div><button class="copy-btn" onclick="copyReply('reply-medium-19', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/PhD/comments/1rx2g2b/gimme_some_motivation_that_still_drives_you_to_do/" target="_blank" rel="noopener">Gimme, some motivation, that still drives you to do your PhD</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/PhD</span>
+        <span class="badge badge-service">Research / Independent Project Coaching</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">Early PhD student stuck on technical challenges without adequate support, needs project guidance.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-medium-20">That feeling of hitting a technical wall without support is really isolating. From what you&#x27;re describing, it sounds like you might benefit from breaking down the technical hurdle into smaller chunks and finding adjacent experts (even outside your lab) who can give specific input. Sometimes the problem isn&#x27;t the difficulty itself but trying to solve it alone in a vacuum. Feel free to DM if you want to dig into this—I&#x27;ve been there.</div><button class="copy-btn" onclick="copyReply('reply-medium-20', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/AskAcademia/comments/1rxo2zz/im_an_religious_studies_major_and_i_want_to_be_a/" target="_blank" rel="noopener">I&#x27;m an Religious Studies major and I want to be a professor</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/AskAcademia</span>
+        <span class="badge badge-service">Research / Independent Project Coaching</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">Undergraduate wanting to become professor, struggling with getting research/internship experience.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-medium-21">The brutal truth: landing competitive internships as an undergrad in religious studies is tough because there aren&#x27;t many formal programs. Instead of just applying to posted internships, try reaching out directly to 2-3 professors doing Mahayana research you admire and asking if they need research assistance - most undergrad research comes from direct relationships, not applications. Your Japanese skills are actually a strong differentiator here. Feel free to DM if you want to talk through building a stronger research profile.</div><button class="copy-btn" onclick="copyReply('reply-medium-21', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/AskAcademia/comments/1rx04z2/how_do_you_stay_motivated_in_research_when/" target="_blank" rel="noopener">how do you stay motivated in research when progress is painfully slow?</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/AskAcademia</span>
+        <span class="badge badge-service">Research / Independent Project Coaching</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">Academic researcher struggling with motivation and progress measurement, could benefit from research coaching.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-medium-22">The slow phases are real and they don&#x27;t mean you&#x27;re failing. I&#x27;ve found it helps to track micro-progress: weekly lit notes, experiments attempted (not just successful ones), or skills you&#x27;re building. Also, consider setting up a monthly &#x27;wins audit&#x27; where you write down what you learned even when data didn&#x27;t cooperate - that reframe has saved me from burnout multiple times. Feel free to DM if you want to dig into progress tracking strategies that actually work.</div><button class="copy-btn" onclick="copyReply('reply-medium-22', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/learnmachinelearning/comments/1rxi949/how_easy_is_it_to_get_a_workshop_paper_accepted/" target="_blank" rel="noopener">How easy is it to get a workshop paper accepted?</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/learnmachinelearning</span>
+        <span class="badge badge-service">Research / Independent Project Coaching</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">Undergrad asking about workshop paper feasibility suggests interest in independent research but unclear on next steps.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-medium-23">Absolutely possible — workshop papers are way more accessible than main conference tracks, and undergrad solo authors do get accepted. The key is picking a narrow, well-scoped question and executing cleanly rather than trying to be groundbreaking. If you&#x27;re thinking about writing one, feel free to DM — I can share what makes workshop submissions stand out.</div><button class="copy-btn" onclick="copyReply('reply-medium-23', this)">Copy</button></div>
+    </div>
+    <div class="lead">
+      <div class="lead-title"><a href="https://reddit.com/r/MachineLearning/comments/1rxxrgs/d_when_to_submit_to_a_workshop_and_how_much_are/" target="_blank" rel="noopener">[D] When to submit to a workshop and how much are top tier conference workshop papers worth?</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">reddit · r/MachineLearning</span>
+        <span class="badge badge-service">Research / Independent Project Coaching</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">Person is asking for strategic advice about publication strategy after multiple rejections, showing uncertainty about research direction and decision-making.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-medium-24">Workshop acceptance after 2-3 conference rejections is pretty standard, especially when the field is moving fast. The real question is whether you&#x27;re chasing novelty or contribution — if reviewers kept saying &#x27;compare with X&#x27;, that&#x27;s fixable, but if the core idea got stale, a workshop lets you move on. Generally: submit to workshops when the incremental effort to satisfy conference reviewers exceeds the value of the venue upgrade. Happy to share more if useful.</div><button class="copy-btn" onclick="copyReply('reply-medium-24', this)">Copy</button></div>
+    </div>
   </div>
 
   <div class="tier-section">
     <div class="tier-header" style="border-color:#38a169">
       <span>🟢</span>
       <span class="tier-title">Low Value — High School / Students</span>
-      <span class="tier-count">0</span>
+      <span class="tier-count">1</span>
     </div>
-    <p style="color:#aaa;font-style:italic;font-size:0.85rem;">No leads in this tier today.</p>
+    <div class="lead">
+      <div class="lead-title"><a href="https://news.ycombinator.com/item?id=47433702" target="_blank" rel="noopener">Ask HN: How do you deal with people who trust LLMs?</a></div>
+      <div class="lead-meta">
+        <span class="badge badge-platform">hn</span>
+        <span class="badge badge-service">AI Literacy for Students</span>
+        <span class="badge badge-conf">medium confidence</span>
+      </div>
+      <div class="lead-reasoning">Question about educating others on LLM limitations suggests interest in AI literacy, though not directly seeking personal coaching.</div>
+      <div class="reply-section"><div class="reply-label">Suggested reply</div><div class="reply-text" id="reply-low-0">I find the most effective approach is to show them side-by-side comparisons—ask the LLM a question where you know the answer, watch it hallucinate, then show the actual source. Once someone sees it confidently make up citations or facts, they get it viscerally. The key is helping them understand LLMs are pattern predictors, not knowledge databases—useful tools but terrible oracles. Happy to share more techniques if useful.</div><button class="copy-btn" onclick="copyReply('reply-low-0', this)">Copy</button></div>
+    </div>
   </div>
 
-<div class="empty"><p>No matched leads today.</p><p>Run the pipeline to scrape and match new signals.</p></div>
-  <div class="footer">Generated 2026-03-19 18:35:30 Seattle time</div>
+
+  <div class="footer">Generated 2026-03-19 21:38:06 Seattle time</div>
 </div>
+<script>
+function copyReply(id, btn) {
+  var text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
 </body>
 </html>
