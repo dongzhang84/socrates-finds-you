@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-03-20 08:08 UTC  
+**Generated:** 2026-03-20 18:54 UTC  
 **Showing:** last 3 week(s) of 3 total  
 
 ---
@@ -11,11 +11,11 @@
 |------|-------|
 | Status | ⚠️ Slow |
 | Active days | 4 / 7 |
-| Total commits | 32 |
+| Total commits | 33 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| **17** | **8** | ⚪ | **6** | **1** | ⚪ | ⚪ |
+| **17** | **8** | ⚪ | **6** | **2** | ⚪ | ⚪ |
 
 **Mon – Monday, Mar 16**
 
@@ -59,6 +59,7 @@
 
 **Fri – Friday, Mar 20**
 
+- `ff0ef96` fix: align HTML report with Flask dashboard — query by date, always regenerate — _dongzhang84_ `2026-03-20 11:53`
 - `083df27` docs: update all docs for v2.0 — conversion scoring, HTML report, GitHub Pages — _dongzhang84_ `2026-03-20 01:07`
 
 ---
