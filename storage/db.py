@@ -49,8 +49,6 @@ def init_db() -> None:
             pass  # Column already exists
         conn.commit()
 
-    # Remove signals from retired subreddits
-    delete_signals_by_subreddit("cscareerquestions")
 
 
 def delete_signals_by_subreddit(subreddit: str) -> int:

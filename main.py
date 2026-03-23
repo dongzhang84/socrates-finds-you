@@ -50,7 +50,7 @@ REDDIT_SUBREDDITS = [
     # TIER_MEDIUM
     "learnmachinelearning", "GradSchool",
     # TIER_LOW
-    "SAT", "ApplyingToCollege", "learnpython",
+    "SAT", "ApplyingToCollege", "learnpython", "cscareerquestions",
 ]
 
 XIAOHONGSHU_KEYWORDS = [
