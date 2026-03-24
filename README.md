@@ -4,6 +4,18 @@
 
 An automated pipeline that finds people who need STEM, AI, and career mentorship — before they find you.
 
+---
+
+## Daily Workflow
+
+```bash
+python3 main.py       # scrape + match + generate report
+./push_report.sh      # publish today's report to GitHub Pages
+python3 app.py        # open local dashboard → http://localhost:8080
+```
+
+**Live report:** [https://dongzhang84.github.io/socrates-finds-you](https://dongzhang84.github.io/socrates-finds-you)
+
 Scrapes LinkedIn, Blind, Reddit, Hacker News, RSS feeds, and The Grad Cafe for coaching signals, uses **Claude AI** to match each post against a service menu, and delivers a ranked daily Markdown report with a local web dashboard.
 
 **You focus on outreach. The pipeline handles discovery.**
