@@ -13,13 +13,13 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 TOPICS = [
-    "/channels/Career",
-    "/channels/Job-Search",
-    "/channels/Career-Advice",
-    "/channels/working-parents",
-    "/channels/AI-Machine-Learning",
+    "/channels/artificial-intelligence",   # was /channels/AI-Machine-Learning (not found)
     "/channels/Data-Science",
-    "/channels/Software-Engineering",
+    "/channels/software-engineering",      # was /channels/Software-Engineering (wrong case)
+    "/channels/Job-Openings",              # was /channels/Job-Search (not found)
+    "/channels/Compensation",
+    "/channels/Tech",
+    "/channels/interview-experiences",
 ]
 
 BASE_URL = "https://www.teamblind.com"
@@ -164,8 +164,8 @@ def scrape_blind(max_posts: int = 100, debug: bool = False) -> list[dict]:
                             const url = card.href.split('?')[0];
                             if (!url || seen.has(url)) continue;
 
-                            // Title: try /topics/ testid first, then broader fallbacks for /channels/
-                            const titleEl = card.querySelector('[data-testid="popular-article-preview-title"]')
+                            // Title: confirmed data-testid from debug_blind.html inspection
+                            const titleEl = card.querySelector('[data-testid="article-preview-title"]')
                                          || card.querySelector('[data-testid*="title"]')
                                          || card.querySelector('h2, h3, [class*="title"], [class*="Title"]');
                             const title = (titleEl ? titleEl.innerText : card.innerText).trim().split('\\n')[0];
