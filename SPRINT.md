@@ -1,11 +1,29 @@
 # Sprint Report
 
-**Generated:** 2026-03-24 21:30 UTC  
-**Showing:** last 4 week(s) of 4 total  
+**Generated:** 2026-03-31 06:06 UTC  
+**Showing:** last 5 week(s) of 5 total  
 
 ---
 
-## Week 4 _(current)_ · 2026-03-23 to 2026-03-29
+## Week 5 _(current)_ · 2026-03-30 to 2026-04-05
+
+| Stat | Value |
+|------|-------|
+| Status | ❌ Stalled |
+| Active days | 1 / 7 |
+| Total commits | 1 |
+
+| Mon | Tue | Wed | Thu | Fri | Sat | Sun |
+|---|---|---|---|---|---|---|
+| **1** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+
+**Mon – Monday, Mar 30**
+
+- `5fd84ed` fix: correct Blind channel URLs and title selector — _dongzhang84_ `2026-03-30 23:05`
+
+---
+
+## Week 4 · 2026-03-23 to 2026-03-29
 
 | Stat | Value |
 |------|-------|
